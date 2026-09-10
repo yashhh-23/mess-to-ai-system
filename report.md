@@ -19,6 +19,10 @@ Customer support operations on social media channels like Twitter demand rapid, 
 ### 1.2 Post-Generation Validation & Separated Metric Denominators
 Rather than presenting inflated offline accuracy figures, this project proves trustworthiness through rigorous evaluation methodology:
 - A **200-Item Golden Evaluation Set** created with documented annotation guidelines (`golden/labeling_guidelines.md`) and rule-assisted reference labeling (`annotator_id = "reference_pipeline_v1"`, `is_human_annotated = false` for all 200 items). Gold intent and escalation labels are assigned by heuristic rules; gold replies are observed historical `@AmazonHelp` Twitter replies. **No independent human annotator assigned these labels.**
+
+> ⚠️ **Golden Set Metadata Disclosure**:  
+> In `golden/golden_set.jsonl`, all 200 records explicitly store `"annotator_id": "reference_pipeline_v1"`, `"annotation_method": "rule_assisted_reference_labeling"`, and `"is_human_annotated": false`. `human_expert_1` is NOT a real person, and labels were not created by manual human adjudication. Gold replies are observed historical human `@AmazonHelp` support responses.
+
 - A **Separated Evaluation Metric Harness** (`src/evaluate.py`): Routing quality (Escalation F1 & Intent Accuracy) is evaluated across all items, while reply quality (`Mean Judge Score` & `Reply Similarity`) is computed strictly over the generated reply subset, accompanied by an explicit **`Reply Coverage`** metric.
 - A **Post-Generation Validation Layer** (`PostGenerationValidator` in `src/reply_generator.py`) enforcing hard character length limits ($\le 280$ chars), mandatory `<USER>` and `<URL>` placeholders, sensitive data checks, and sanitization of unconditional operational guarantees.
 - An **Auditable Evaluator Harness** (`src/llm_judge.py`) that transparently distinguishes between live API evaluations (`LLM-as-Judge`) and offline fallback runs (`Heuristic Rubric Evaluator`), outputting full per-item JSONL logs (`results/judge_audit_log.jsonl`).

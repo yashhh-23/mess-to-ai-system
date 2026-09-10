@@ -56,9 +56,18 @@ Ground truth metrics exported directly from `results/evaluation_results.json`. B
 - **Spearman Rank Correlation ($\rho$)**: `0.0289` (95% Bootstrap CI: `[-0.2412, 0.2950]`)
 - **Systematic Bias $E[\text{Judge} - \text{Calibration}]$**: `-0.6739` (95% Bootstrap CI: `[-0.9820, -0.3658]`)
 - **Binary Threshold Agreement ($\ge 5/7$)**: `97.8%` (95% Bootstrap CI: `[93.6%, 100.0%]`)
-- **Cohen's Kappa ($\kappa$)**: `0.0000` (95% Bootstrap CI: `[0.0000, 0.0000]`)
+### Golden Evaluation Set Metadata & Provenance Disclaimer
+
+> ⚠️ **Dataset Metadata Transparency**:  
+> Every item in `golden/golden_set.jsonl` explicitly records:
+> - `"annotator_id": "reference_pipeline_v1"`
+> - `"annotation_method": "rule_assisted_reference_labeling"`
+> - `"is_human_annotated": false`
+> 
+> **Explicit Disclaimer**: These labels were produced by a heuristic pipeline (`reference_pipeline_v1`); `human_expert_1` is NOT a real person, and labels were NOT created by manual human adjudication. Gold replies (`gold_reply`) are observed historical `@AmazonHelp` Twitter brand responses.
 
 ---
+
 
 ## 15-Minute Reproducibility & Multi-Provider LLM Guide
 
