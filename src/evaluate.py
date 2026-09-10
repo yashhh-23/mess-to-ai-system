@@ -21,7 +21,7 @@ def compute_token_jaccard_overlap(s1: str, s2: str) -> float:
     """
     Computes Token-set Jaccard overlap with the reference reply.
     Simple diagnostic surface metric over unigram token sets. Does NOT measure semantic
-    similarity, word order, negation, factual grounding, or support resolution quality.
+    similarity, word order, negation, factual grounding, or support interaction quality.
     """
     if not s1 or not s2:
         return 0.0
@@ -381,7 +381,7 @@ def run_evaluation(config_path: str = "configs/config.yaml", run_id: Optional[st
         with open(human_calib_path, 'r', encoding='utf-8') as f:
             calib_items = json.load(f)
             human_calib_dict = {c['item_id']: c for c in calib_items}
-        print(f"[Evaluation Harness] Loaded {len(human_calib_dict)} authentic human calibration annotations.")
+        print(f"[Evaluation Harness] Loaded {len(human_calib_dict)} calibration annotation records (placeholder annotator IDs; independent verification pending).")
 
     clf = HybridIntentClassifier()
     clf.load(config['paths']['intent_model'])

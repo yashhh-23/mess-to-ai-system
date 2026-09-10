@@ -130,7 +130,7 @@ class PostGenerationValidator:
 class RAGReplyGenerator:
     """
     Retrieval-Augmented Generation (RAG) Reply Engine.
-    Uses Top-K historical resolutions as evidence to synthesize responses via LLMClient,
+    Uses Top-K historical support interactions as evidence to synthesize responses via LLMClient,
     or via an evidence-adapted fallback engine when API keys are absent.
     Includes post-generation validation and citation tracing.
     """

@@ -101,7 +101,7 @@ class EscalationEngine:
             if keyword_risk > 0:
                 reasons.append("negative sentiment terms")
             if low_retrieval_risk > 0.5:
-                reasons.append("low historical resolution match")
+                reasons.append("low historical support interaction match")
             if thread_length_risk > 0.5:
                 reasons.append("extended thread depth")
             if sentiment_risk > 0.5:
