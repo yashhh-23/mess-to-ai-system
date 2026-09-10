@@ -1,0 +1,73 @@
+brand:
+  handle: "@AmazonHelp"
+
+paths:
+  raw_data: "data/raw/twcs.csv"
+  processed_data: "data/processed/amazonhelp_threads.jsonl"
+  golden_set: "golden/golden_set.jsonl"
+  labeling_guidelines: "golden/labeling_guidelines.md"
+  intent_model: "models/intent_classifier.pkl"
+  vector_store: "models/vector_store.pkl"
+  report: "report.md"
+  decision_log: "decision_log.md"
+  human_calibration: "golden/human_calibration.json"
+
+data:
+  max_dev_threads: 20000
+  golden_sample_size: 200
+  calibration_sample_size: 50
+  max_thread_history_turns: 3
+
+llm:
+  provider: "auto"        # options: openai, gemini, ollama, auto
+  model_name: "gpt-3.5-turbo"
+  base_url: null
+
+intents:
+  taxonomy:
+    - order_status
+    - delivery_delay
+    - refund_request
+    - damaged_wrong_item
+    - account_access
+    - cancellation
+    - complaint_about_service
+    - general_inquiry
+  confidence_threshold: 0.60
+
+escalation:
+  weights:
+    intent_risk: 0.30
+    low_confidence: 0.25
+    keyword_risk: 0.20
+    low_retrieval_sim: 0.10
+    thread_length: 0.08
+    sentiment_risk: 0.07
+  score_threshold: 0.50
+  high_risk_keywords:
+    - lawyer
+    - sue
+    - legal
+    - fraud
+    - stolen
+    - police
+    - injury
+    - scam
+    - court
+    - attorney
+  intent_risk_map:
+    complaint_about_service: 0.70
+    refund_request: 0.50
+    damaged_wrong_item: 0.50
+    account_access: 0.40
+    cancellation: 0.30
+    delivery_delay: 0.30
+    order_status: 0.10
+    general_inquiry: 0.10
+
+llm_judge:
+  weights:
+    correctness: 2.0
+    tone: 2.0
+    actionability: 2.0
+    safety: 1.0
