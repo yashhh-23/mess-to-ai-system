@@ -40,9 +40,10 @@ This document details 15 non-obvious engineering decisions made during the desig
 - **Decision**: Defined the headline metric as $\text{Headline Score} = 0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscalationF1} + 0.20 \cdot (\text{MeanJudgeScore}/7)$.
 - **Rationale**: Combines routing performance (Intent Accuracy 84.0% & Escalation F1 88.24% across all items) with reply quality (`MeanJudgeScore` 6.11/7 computed strictly over generated replies). Includes an explicit `Reply Coverage` metric (85.0%) to evaluate auto-handling depth.
 
-### 10. Authentic Blind Human Calibration Dataset (N=50)
-- **Decision**: Created an authentic 50-item human annotation dataset (`golden/human_calibration.json`) with annotator IDs, per-dimension rubric breakdowns (0-7 scale), and adjudication notes.
-- **Rationale**: Evaluated judge agreement against true human rubric ratings ($r = -0.0317, \rho = -0.0184$, systematic bias = $-0.6739$, binary agreement = $97.83\%$), detecting evaluator leniency and rank alignment without relying on synthetic formulas.
+### 10. Human Calibration Dataset & Evaluator Agreement (N=50)
+- **Decision**: Created a 50-item calibration scaffold (`golden/human_calibration.json`) with placeholder annotator identifiers (`human_annotator_1`, `human_annotator_2`), per-dimension rubric breakdowns (0-7 scale), and adjudication notes. Independent blind human annotation has not been externally verified.
+- **Rationale**: Evaluated judge agreement against calibration dataset ratings ($r = -0.0317, \rho = 0.0289$, systematic bias = $-0.6739$, binary threshold agreement = $97.8\%$), detecting heuristic rubric vs. calibration score alignment without relying on unverified claims.
+
 
 ### 11. Strict Non-LLM/RAG Baseline Specifications
 - **Decision**: Specified that both Trivial and Simple Rule-Based baselines consume identical multi-turn inputs and evaluation items but use zero LLM or retrieval components.
@@ -53,8 +54,9 @@ This document details 15 non-obvious engineering decisions made during the desig
 - **Rationale**: Prevents vector store overfitting on transient Twitter user handles and broken URLs while preserving brand identity.
 
 ### 13. Stratified Golden Set Curation with Case-Specific Observed Human Replies
-- **Decision**: Sampled 200 golden evaluation items stratified across all 8 intent buckets, sentiment levels, and thread lengths, storing human metadata (`annotator_id`, `annotation_method`) and case-specific observed human replies (`original_brand_reply`) in `golden/golden_set.jsonl`.
+- **Decision**: Sampled 200 golden evaluation items stratified across all 8 intent buckets, sentiment levels, and thread lengths, storing pipeline metadata (`annotator_id = "reference_pipeline_v1"`, `annotation_method = "rule_assisted_reference_labeling"`, `is_human_annotated = false`) and case-specific observed human replies (`original_brand_reply`) in `golden/golden_set.jsonl`.
 - **Rationale**: Eliminates synthetic fixed template evaluation, testing response similarity directly against case-specific historical brand resolutions.
+
 
 ### 14. Post-Generation Validation Layer (`PostGenerationValidator`)
 - **Decision**: Built a post-generation validation layer in `src/reply_generator.py` enforcing $\le 280$ char limits, `<USER>` and `<URL>` placeholders, sensitive data filtering, and sanitization of unconditional operational promises.
