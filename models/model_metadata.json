@@ -1,0 +1,40 @@
+{
+  "run_id": "2026-09-10T040801Z",
+  "run_dir": "results\\runs\\2026-09-10T040801Z",
+  "train_timestamp": "2026-09-10T04:08:01Z",
+  "git_commit_sha": "NO_GIT_REPO",
+  "source_code_hash": "0b416eff377afb39f9ee01fcec5419f7638f01d083e891a4ad484dab180d9ea6",
+  "python_version": "3.13.7",
+  "library_versions": {
+    "scikit-learn": "1.9.0",
+    "pandas": "3.0.3",
+    "numpy": "2.2.6",
+    "pyyaml": "6.0.3"
+  },
+  "random_seed": 42,
+  "resolved_brand_handle": "@AmazonHelp",
+  "sample_counts": {
+    "total_threads": 20000,
+    "train_count": 19800,
+    "golden_count": 200,
+    "vector_index_count": 19800
+  },
+  "train_class_distribution": {
+    "cancellation": 285,
+    "refund_request": 958,
+    "complaint_about_service": 875,
+    "account_access": 1462,
+    "general_inquiry": 13570,
+    "damaged_wrong_item": 173,
+    "order_status": 1445,
+    "delivery_delay": 1032
+  },
+  "config_hash": "b51d416f9fa40838cd6a0bc613b835d0",
+  "raw_data_checksum": "73e961b2837626de89618a3f35f7bd6c",
+  "dataset_manifest_checksum": "44f66604faeab9d3b64cda897e3840d0",
+  "processed_data_checksum": "34dddd80a9e7519b61c05b8dcb5082cb",
+  "golden_set_checksum": "90bf75182fedfbe902cbdacc70d1e095",
+  "intent_model_checksum": "92a6747ead0df94a7ef1436b4c51228d",
+  "vector_store_checksum": "52fed3444a50e7802e3f272d6989a702",
+  "pipeline_status": "FRESH_REPRODUCED"
+}
