@@ -1,5 +1,7 @@
 brand:
   handle: "@AmazonHelp"
+  # fallback_handle: "@AmericanAir"  # Status: Disabled in data_cleaning.py to prevent cross-domain task contamination.
+
 
 paths:
   raw_data: "data/raw/twcs.csv"
