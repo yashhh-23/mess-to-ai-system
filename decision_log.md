@@ -1,6 +1,6 @@
-# Decision Log: 15 Non-Obvious Architecture & Design Decisions
+# Decision Log: 20 Non-Obvious Architecture & Design Decisions
 
-This document details 15 non-obvious engineering decisions made during the design, implementation, and evaluation of the Twitter Customer Support AI Agent.
+This document details 20 non-obvious engineering decisions made during the design, implementation, and evaluation of the Twitter Customer Support AI Agent.
 
 ---
 

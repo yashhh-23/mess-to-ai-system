@@ -7,7 +7,7 @@
 ## Deliverables & Documentation Links
 
 - 📄 **[Comprehensive Project Report](report.md)**: 6-page report detailing Problem Framing, Benchmark Results, Per-Class Intent Breakdown, Top 5 Failure Analysis, and *"What is Misleading About My Headline Number?"*.
-- 📋 **[Decision Log](decision_log.md)**: 18 non-obvious architecture, data leakage, RAG, multi-provider LLM, safety, and evaluation decisions.
+- 📋 **[Decision Log](decision_log.md)**: 20 non-obvious architecture, data leakage, RAG, multi-provider LLM, safety, and evaluation decisions.
 - 📐 **[Labeling Guidelines](golden/labeling_guidelines.md)**: Documented rules and edge-case guidelines for Golden Set annotation.
 - 📓 **[Notebooks Directory](notebooks/)**: Jupyter notebooks covering Data Exploration (`01_explore_data.ipynb`), Intent Taxonomy Analysis (`02_define_intents.ipynb`), and Golden Set Construction & Data Leakage Audit (`03_build_golden_set.ipynb`).
 - 👤 **[Calibration Dataset](golden/human_calibration.json)**: 50-item calibration set with placeholder annotator IDs (`human_annotator_1`, `human_annotator_2`), rubric scores, and adjudication notes. **Independent blind human annotation not externally verified.**
@@ -69,7 +69,7 @@ Ground truth metrics exported directly from `results/evaluation_results.json`. B
 ---
 
 
-## 15-Minute Reproducibility & Multi-Provider LLM Guide
+## End-to-End Reproducibility & Multi-Provider LLM Guide
 
 ### 1. Prerequisites & Environment Setup
 Requires Python 3.10+ environment.
@@ -96,7 +96,7 @@ export GEMINI_API_KEY="your-gemini-key"
 *Note*: If no API key is provided, the harness automatically and transparently runs in **Heuristic Fallback Mode**, recording all details to `results/judge_audit_log.jsonl`.
 
 ### 3. Master Reproducibility Pipeline Execution
-Run the complete end-to-end pipeline (data ingest, thread cleaning, golden verification, model training, indexing, and evaluation) in under 90 seconds:
+Run the complete end-to-end pipeline (data ingest, thread cleaning, golden verification, model training, indexing, and evaluation) (~25s execution time with pre-cached raw data, or under 15 minutes on fresh download):
 
 ```bash
 python run_pipeline.py
@@ -111,16 +111,17 @@ pytest tests/test_agent.py
 
 ---
 
-## Repository Structure
+## Codebase Repository Structure
 
 ```
-MLproject/
+.
 ├── configs/
-│   └── config.yaml               # Brand, model, LLM provider, and escalation settings
+│   └── config.yaml               # System configuration parameters
 ├── data/
 │   ├── raw/                      # Raw Kaggle Twitter dataset (twcs.csv)
 │   └── processed/                # Cleaned brand JSONL threads (20,000 items)
 ├── golden/
+│   ├── __init__.py
 │   ├── golden_set.jsonl          # 200 rule-assisted reference-labeled evaluation items (is_human_annotated=false)
 │   ├── build_golden_set.py       # Stratified golden set verification script
 │   ├── create_human_calibration.py # Human calibration dataset verification script
@@ -151,7 +152,7 @@ MLproject/
 │   └── evaluate.py               # Complete evaluation harness
 ├── tests/
 │   └── test_agent.py             # Pytest verification suite
-├── decision_log.md               # 15 non-obvious architecture & design decisions
+├── decision_log.md               # 20 non-obvious architecture & design decisions
 ├── report.md                     # 6-page project report matching assignment headings 1:1
 ├── requirements.txt              # Dependency specifications
 └── README.md                     # This reproducibility guide

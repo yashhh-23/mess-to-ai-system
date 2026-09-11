@@ -12,7 +12,7 @@
 
 ### 1.1 Goal & Operational Scope
 Customer support operations on social media channels like Twitter demand rapid, accurate, and empathetic responses while safeguarding the brand against severe operational, legal, and reputational risks. The primary objective of this project is to build and evaluate a compact, reproducible AI support agent for **@AmazonHelp** that:
-1. **Classifies Customer Intents**: Accurately categorizes incoming customer messages (along with multi-turn conversation context) into 8 data-derived intents.
+1. **Classifies Customer Intents**: Accurately categorizes incoming customer messages (along with multi-turn conversation context) into 8 domain-designed and EDA-validated intents.
 2. **Drafts Grounded RAG Replies**: Uses Retrieval-Augmented Generation (RAG) over historical `@AmazonHelp` customer-reply resolution pairs to synthesize brand-aligned responses.
 3. **Makes Explainable Escalation Decisions**: Combines probabilistic intent confidence, keyword safety triggers, historical retrieval similarity, sentiment distress, and thread turn depth to decide whether to auto-handle or escalate to a human agent with an explicit reason.
 
@@ -152,7 +152,7 @@ Below are 5 concrete failure modes observed during evaluation, complete with rea
 
 ## 4. What Is Misleading About My Headline Number? (Operational & Design Critique)
 
-> **Important Note**: The Combined Headline Score ($0.8687$) is maintained strictly as a **secondary dashboard summary metric**, NOT as a primary claim of system quality. Primary evaluation relies on unaggregated component metrics: Intent Accuracy ($84.0\%$), Escalation F1 ($89.86\%$), Escalation Recall ($81.58\%$), and Reply Coverage ($84.5\%$).
+> **Important Note**: The Combined Headline Score ($0.8636$) is maintained strictly as a **secondary dashboard summary metric**, NOT as a primary claim of system quality. Primary evaluation relies on unaggregated component metrics: Intent Macro F1 ($0.8407$), Escalation F1 ($88.24\%$), Escalation Recall ($78.95\%$), and Reply Coverage ($85.0\%$).
 
 Below is an explicit, rigorous critique of the six major design & operational gaps of the headline metric:
 
@@ -160,13 +160,13 @@ Below is an explicit, rigorous critique of the six major design & operational ga
 The weights in the scalar metric ($0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscalationF1} + 0.20 \cdot \frac{\text{JudgeScore}}{7}$) are heuristic choices rather than values derived from real-world business financial models. In production, routing errors carry vastly different financial consequences than minor tone defects.
 
 ### 4.2 Exclusion of Reply Coverage from the Single Scalar Metric
-`Reply Coverage` ($84.5\%$) measures the proportion of customer queries handled automatically vs. escalated ($15.5\%$). Omitting coverage from the scalar equation means a system could achieve an artificially high score by escalating $99\%$ of traffic and rating only $1\%$ of trivial replies.
+`Reply Coverage` ($85.0\%$) measures the proportion of customer queries handled automatically vs. escalated ($15.0\%$). Omitting coverage from the scalar equation means a system could achieve an artificially high score by escalating $99\%$ of traffic and rating only $1\%$ of trivial replies.
 
 ### 4.3 Evaluator Mode & Generation Mode Mixing
 Evaluation runs without external LLM API keys utilize a **Heuristic Rubric Evaluator** (`Heuristic Rubric Evaluator (Fallback)`) and **Evidence-Adapted Fallbacks**. Mixing heuristic rule evaluations with true LLM-as-Judge API evaluations across different run environments creates cross-run metric variance.
 
 ### 4.4 Reference Quality Tested Against Templated/Historical Gold Replies
-Response similarity ($0.1230$) compares model-generated replies against historical observed brand replies. When historical brand replies use standardized templates, generated replies are rewarded for matching templated structures rather than resolving bespoke customer issues.
+Response similarity ($0.1244$) compares model-generated replies against historical observed brand replies. When historical brand replies use standardized templates, generated replies are rewarded for matching templated structures rather than resolving bespoke customer issues.
 
 ### 4.5 Asymmetric Escalation Costs vs. Symmetric F1 Score
 In live customer support, failing to escalate a severe legal threat or safety issue (False Negative) has catastrophic brand consequences, whereas falsely escalating a routine tracking query (False Positive) merely incurs minor agent labor costs. Standard F1 weights precision and recall symmetrically ($1:1$), failing to reflect real-world cost asymmetry.
@@ -195,4 +195,4 @@ If given one additional week to expand this project, I would implement the follo
 
 ## 6. Decision Log
 
-A complete record of 17 non-obvious architecture, design, data leakage guard, multi-provider LLM, post-generation validation, and evaluation decisions is documented in **[decision_log.md](file:///c:/Users/sanke/Desktop/New%20folder/MLproject/decision_log.md)**.
+A complete record of 20 non-obvious architecture, design, data leakage guard, multi-provider LLM, post-generation validation, and evaluation decisions is documented in **[decision_log.md](decision_log.md)**.
