@@ -113,13 +113,14 @@ def build_threads_for_brand(df: pd.DataFrame, brand_handle: str = "@AmazonHelp",
     print(f"[Data Cleaning] Successfully extracted {len(threads)} clean multi-turn threads for {brand_handle}.")
     return threads
 
-def run_pipeline(config_path="configs/config.yaml") -> str:
+def run_pipeline(config_path="configs/config.yaml", brand_handle: str = None) -> str:
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
         
     raw_path = config['paths']['raw_data']
     processed_path = config['paths']['processed_data']
-    brand_handle = config['brand']['handle']
+    if brand_handle is None:
+        brand_handle = config['brand']['handle']
     max_threads = config['data']['max_dev_threads']
     max_history_turns = config['data'].get('max_thread_history_turns', 3)
     
@@ -134,7 +135,7 @@ def run_pipeline(config_path="configs/config.yaml") -> str:
     resolved_handle = brand_handle
     if len(threads) < 100:
         raise ValueError(
-            f"[Data Cleaning Error] Brand '{brand_handle}' produced only {len(threads)} clean threads (minimum 100 required). "
+            f"[Data Cleaning Error] Insufficient thread data for brand '{brand_handle}': produced only {len(threads)} clean threads (minimum 100 required). "
             f"Silent fallback brand switching has been disabled to prevent domain task contamination. "
             f"Please verify raw dataset contains sufficient tweets for '{brand_handle}'."
         )

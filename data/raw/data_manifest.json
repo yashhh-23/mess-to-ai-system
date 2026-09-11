@@ -1,7 +1,7 @@
 {
   "source_dataset": "thoughtvector/customer-support-on-twitter (TWCS)",
   "download_url": "https://huggingface.co/datasets/SunidhiSriram/twcs/resolve/main/twcs.csv",
-  "ingest_timestamp": "2026-09-11T01:31:38Z",
+  "ingest_timestamp": "2026-09-11T02:06:27Z",
   "file_path": "data/raw/twcs.csv",
   "file_size_bytes": 516508641,
   "file_sha256_sample": "496ca32577624e26aa631cbd81e517df9e96b0a08df3d075b3e11f5ca4f0c9a0",

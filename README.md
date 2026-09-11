@@ -31,18 +31,18 @@ Ground truth metrics exported directly from `results/evaluation_results.json`. B
 
 | Model / System | Secondary Composite Headline Score (95% CI) | Formula Weighting Basis | Mean Judge Score (0-7) (95% CI)* | Reply Similarity (95% CI)* |
 |---|---|---|---|---|
-| **Main Agent** | **0.8636 [0.8241, 0.9004]** | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | **6.11 / 7 [5.98, 6.24]** | **0.1244 [0.1115, 0.1382]** |
+| **Main Agent** | **0.5516 [0.5043, 0.6090]** | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | **6.15 / 7 [6.07, 6.23]** | **0.1271 [0.1172, 0.1378]** |
 | **Simple Rule Baseline** | 0.5849 [0.5284, 0.6391] | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | 6.00 / 7 [6.00, 6.00] | 0.0796 [0.0710, 0.0885] |
 | **Trivial Baseline** | 0.2314 [0.2081, 0.2562] | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | 6.00 / 7 [6.00, 6.00] | 0.0650 [0.0581, 0.0723] |
 
-*\*Note*: Mean Judge Score and Reply Similarity are calculated strictly over the non-escalated generated reply subset ($N=170$ for Main Agent, $N=175$ for Simple Baseline, $N=200$ for Trivial Baseline).
+*\*Note*: Mean Judge Score and Reply Similarity are calculated strictly over the non-escalated generated reply subset ($N=198$ for Main Agent, $N=175$ for Simple Baseline, $N=200$ for Trivial Baseline).
 
 > ⚠️ **Evaluated Run Execution Mode Disclosure**:  
 > The stored benchmark results exported to `results/evaluation_results.json` reflect zero-API-cost deterministic offline fallback execution:
 > - **Classifier**: TF-IDF Logistic Regression trained via weak supervision (`_rule_fallback`).
 > - **Retriever**: TF-IDF Lexical Retrieval over observed historical `@AmazonHelp` support interaction pairs.
-> - **Generation Engine**: `Evidence-Adapted-Fallback` (145 items) & `Template-Fallback` (25 items).
-> - **Evaluator**: `Heuristic Rubric Evaluator (Fallback)` (170 items).
+> - **Generation Engine**: `Evidence-Adapted-Fallback` (168 items) & `Template-Fallback` (30 items).
+> - **Evaluator**: `Heuristic Rubric Evaluator (Fallback)` (198 items).
 >
 > While `LLMClient` supports live OpenAI, Gemini, and Ollama API synthesis (`LLM-RAG-Synthesized` / `LLM-as-Judge`), the stored benchmark run in this repository executed via the offline fallback pipeline.
 

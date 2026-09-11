@@ -38,7 +38,7 @@ All systems were evaluated on the exact same 200 Golden Set items using identica
 
 | Model / System | Intent Macro F1 (95% CI) | Escalation Precision (95% CI) | Escalation Recall (95% CI) | Escalation F1 (95% CI) | Escalation Confusion Matrix [TP, FP, FN, TN] | Reply Coverage (95% CI) | Reply Safety Pass Rate |
 |---|---|---|---|---|---|---|---|
-| **Main Agent** | **0.8407 [0.7835, 0.8931]** | **1.0000 [1.0000, 1.0000]** | **0.7895 [0.6500, 0.9000]** | **0.8824 [0.7879, 0.9474]** | **[30, 0, 8, 162]** | **85.0% [80.0%, 89.5%]** | **100.0%** |
+| **Main Agent** | **0.8407 [0.7852, 0.8842]** | **1.0000 [0.0000, 1.0000]** | **0.0526 [0.0000, 0.1316]** | **0.1000 [0.0000, 0.2326]** | **[2, 0, 36, 162]** | **99.0% [75.0%, 86.5%]** | **100.0%** |
 | **Simple Rule Baseline** | 0.1703 [0.1251, 0.2214] | 1.0000 [1.0000, 1.0000] | 0.6579 [0.5000, 0.8000] | 0.7937 [0.6667, 0.8889] | [25, 0, 13, 162] | 87.5% [83.0%, 91.5%] | 100.0% |
 | **Trivial Baseline** | 0.0326 [0.0210, 0.0450] | 0.0000* [0.0000, 0.0000] | 0.0000 [0.0000, 0.0000] | 0.0000 [0.0000, 0.0000] | [0, 0, 38, 162] | 100.0% [100.0%, 100.0%] | 100.0% |
 
@@ -52,18 +52,18 @@ The scalar composite score is reported strictly as a secondary internal referenc
 
 | Model / System | Secondary Composite Headline Score (95% CI) | Formula Weighting Basis | Mean Judge Score (0-7) (95% CI)* | Reply Similarity (95% CI)* |
 |---|---|---|---|---|
-| **Main Agent** | **0.8636 [0.8241, 0.9004]** | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | **6.11 / 7 [5.98, 6.24]** | **0.1244 [0.1115, 0.1382]** |
+| **Main Agent** | **0.5516 [0.5043, 0.6090]** | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | **6.15 / 7 [6.07, 6.23]** | **0.1271 [0.1172, 0.1378]** |
 | **Simple Rule Baseline** | 0.5849 [0.5284, 0.6391] | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | 6.00 / 7 [6.00, 6.00] | 0.0796 [0.0710, 0.0885] |
 | **Trivial Baseline** | 0.2314 [0.2081, 0.2562] | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | 6.00 / 7 [6.00, 6.00] | 0.0650 [0.0581, 0.0723] |
 
-*\*Note*: Mean Judge Score and Reply Similarity are calculated strictly over the non-escalated generated reply subset ($N=170$ for Main Agent, $N=175$ for Simple Baseline, $N=200$ for Trivial Baseline).
+*\*Note*: Mean Judge Score and Reply Similarity are calculated strictly over the non-escalated generated reply subset ($N=198$ for Main Agent, $N=175$ for Simple Baseline, $N=200$ for Trivial Baseline).
 
 > ⚠️ **Evaluated Run Execution Mode Disclosure**:  
 > The stored benchmark results exported to `results/evaluation_results.json` reflect zero-API-cost deterministic offline fallback execution:
 > - **Classifier**: TF-IDF Logistic Regression trained via weak supervision (`_rule_fallback`).
 > - **Retriever**: TF-IDF Lexical Retrieval over observed historical `@AmazonHelp` support interaction pairs.
-> - **Generation Engine**: `Evidence-Adapted-Fallback` (145 items) & `Template-Fallback` (25 items).
-> - **Evaluator**: `Heuristic Rubric Evaluator (Fallback)` (170 items).
+> - **Generation Engine**: `Evidence-Adapted-Fallback` (168 items) & `Template-Fallback` (30 items).
+> - **Evaluator**: `Heuristic Rubric Evaluator (Fallback)` (198 items).
 >
 > While `LLMClient` supports live OpenAI, Gemini, and Ollama API synthesis (`LLM-RAG-Synthesized` / `LLM-as-Judge`), the stored benchmark run in this repository executed via the offline fallback pipeline.
 
@@ -72,10 +72,10 @@ To avoid pooling quality across disparate generation engines, metrics are decomp
 
 | Generation Engine Mode | Count (Items) | Mean Judge Score (0-7) | Mean Reply Similarity | Reply Safety Pass Rate |
 |---|---|---|---|---|
-| `Evidence-Adapted-Fallback` | 145 | 6.13 | 0.1285 | 100.0% |
-| `Template-Fallback` | 25 | 6.00 | 0.1008 | 100.0% |
-| `Escalated (No Reply)` | 30 | N/A (Escalated) | N/A (Escalated) | N/A (Escalated) |
-| **Aggregate Fallback Bucket** | **170** | **6.11** | **0.1244** | **100.0%** |
+| `Evidence-Adapted-Fallback` | 168 | 6.06 | 0.1293 | 100.0% |
+| `Template-Fallback` | 30 | 6.63 | 0.1148 | 100.0% |
+| `Escalated (No Reply)` | 2 | N/A (Escalated) | N/A (Escalated) | N/A (Escalated) |
+| **Aggregate Fallback Bucket** | **198** | **6.15** | **0.1271** | **100.0%** |
 | **Aggregate LLM-RAG Bucket** | **0 (Offline Run)** | **N/A** | **N/A** | **N/A** |
 
 ### 2.4 Per-Class Intent Classification Breakdown
@@ -152,7 +152,7 @@ Below are 5 concrete failure modes observed during evaluation, complete with rea
 
 ## 4. What Is Misleading About My Headline Number? (Operational & Design Critique)
 
-> **Important Note**: The Combined Headline Score ($0.8636$) is maintained strictly as a **secondary dashboard summary metric**, NOT as a primary claim of system quality. Primary evaluation relies on unaggregated component metrics: Intent Macro F1 ($0.8407$), Escalation F1 ($88.24\%$), Escalation Recall ($78.95\%$), and Reply Coverage ($85.0\%$).
+> **Important Note**: The Combined Headline Score (0.5516) is maintained strictly as a **secondary dashboard summary metric**, NOT as a primary claim of system quality. Primary evaluation relies on unaggregated component metrics: Intent Macro F1 (0.8407), Escalation F1 (10.00%), Escalation Recall (5.26%), and Reply Coverage (99.0%).
 
 Below is an explicit, rigorous critique of the six major design & operational gaps of the headline metric:
 
@@ -160,13 +160,13 @@ Below is an explicit, rigorous critique of the six major design & operational ga
 The weights in the scalar metric ($0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscalationF1} + 0.20 \cdot \frac{\text{JudgeScore}}{7}$) are heuristic choices rather than values derived from real-world business financial models. In production, routing errors carry vastly different financial consequences than minor tone defects.
 
 ### 4.2 Exclusion of Reply Coverage from the Single Scalar Metric
-`Reply Coverage` ($85.0\%$) measures the proportion of customer queries handled automatically vs. escalated ($15.0\%$). Omitting coverage from the scalar equation means a system could achieve an artificially high score by escalating $99\%$ of traffic and rating only $1\%$ of trivial replies.
+`Reply Coverage` ($99.0\%$) measures the proportion of customer queries handled automatically vs. escalated ($1.0\%$). Omitting coverage from the scalar equation means a system could achieve an artificially high score by escalating $99\%$ of traffic and rating only $1\%$ of trivial replies.
 
 ### 4.3 Evaluator Mode & Generation Mode Mixing
 Evaluation runs without external LLM API keys utilize a **Heuristic Rubric Evaluator** (`Heuristic Rubric Evaluator (Fallback)`) and **Evidence-Adapted Fallbacks**. Mixing heuristic rule evaluations with true LLM-as-Judge API evaluations across different run environments creates cross-run metric variance.
 
 ### 4.4 Reference Quality Tested Against Templated/Historical Gold Replies
-Response similarity ($0.1244$) compares model-generated replies against historical observed brand replies. When historical brand replies use standardized templates, generated replies are rewarded for matching templated structures rather than resolving bespoke customer issues.
+Response similarity ($0.1271$) compares model-generated replies against historical observed brand replies. When historical brand replies use standardized templates, generated replies are rewarded for matching templated structures rather than resolving bespoke customer issues.
 
 ### 4.5 Asymmetric Escalation Costs vs. Symmetric F1 Score
 In live customer support, failing to escalate a severe legal threat or safety issue (False Negative) has catastrophic brand consequences, whereas falsely escalating a routine tracking query (False Positive) merely incurs minor agent labor costs. Standard F1 weights precision and recall symmetrically ($1:1$), failing to reflect real-world cost asymmetry.

@@ -1,6 +1,6 @@
 {
-  "run_id": "2026-09-11T013505Z",
-  "run_directory": "results/runs/2026-09-11T013505Z",
+  "run_id": "2026-09-11T020356Z",
+  "run_directory": "results\\runs\\2026-09-11T020356Z",
   "resolved_brand_handle": "@AmazonHelp",
   "near_duplicate_diagnostics": {
     "max_near_duplicate_similarity": 0.6828,
@@ -16,13 +16,13 @@
     "base_url": null
   },
   "evaluator_mode_counts": {
-    "Heuristic Rubric Evaluator (Fallback)": 170,
-    "Skipped (Escalated)": 30
+    "Heuristic Rubric Evaluator (Fallback)": 198,
+    "Skipped (Escalated)": 2
   },
   "generation_mode_counts": {
-    "Evidence-Adapted-Fallback": 145,
-    "Escalated (No Reply)": 30,
-    "Template-Fallback": 25
+    "Evidence-Adapted-Fallback": 168,
+    "Template-Fallback": 30,
+    "Escalated (No Reply)": 2
   },
   "golden_set_distribution": {
     "total_items": 200,
@@ -48,53 +48,53 @@
     "calibration_disclosure": "Classifier confidence scores are calibrated using CalibratedClassifierCV(cv=3) against weak-supervised rule labels (_rule_fallback). Operational probability calibration claims in live production require human ground-truth evaluation."
   },
   "human_rated_quality": {
-    "sample_size": 46,
+    "sample_size": 50,
     "mean_human_rubric_score": 6.54,
-    "mean_judge_rubric_score": 5.87,
+    "mean_judge_rubric_score": 5.9,
     "provenance_disclosure": "Authentic human calibration annotations imported from golden/human_calibration.json containing 50 blind human-annotated candidate replies evaluated across correctness, tone, actionability, and safety criteria.",
     "agreement_metrics": {
-      "sample_size_n": 46,
-      "human_score_mean": 6.5435,
-      "human_score_std": 0.7134,
-      "judge_score_mean": 5.8696,
-      "judge_score_std": 0.7104,
-      "pearson_r": -0.0317,
-      "pearson_r_95_ci": "[-0.3212, 0.2570]",
-      "spearman_rho": -0.0184,
-      "spearman_rho_95_ci": "[-0.3163, 0.2761]",
-      "systematic_bias": -0.6739,
-      "systematic_bias_95_ci": "[-0.9565, -0.3913]",
+      "sample_size_n": 50,
+      "human_score_mean": 6.54,
+      "human_score_std": 0.7269,
+      "judge_score_mean": 5.9,
+      "judge_score_std": 0.7,
+      "pearson_r": -0.0118,
+      "pearson_r_95_ci": "[-0.2714, 0.2435]",
+      "spearman_rho": 0.0033,
+      "spearman_rho_95_ci": "[-0.2751, 0.2653]",
+      "systematic_bias": -0.64,
+      "systematic_bias_95_ci": "[-0.9400, -0.3400]",
       "binary_threshold": ">= 5.0 / 7.0",
-      "binary_agreement": 0.9783,
-      "binary_agreement_95_ci": "[0.9348, 1.0000]",
+      "binary_agreement": 0.98,
+      "binary_agreement_95_ci": "[0.9400, 1.0000]",
       "cohens_kappa": 0.0,
       "cohens_kappa_95_ci": "[0.0000, 0.0000]",
       "bootstrap_ci_details": {
-        "pearson_r_ci": "[-0.3212, 0.2570]",
-        "spearman_rho_ci": "[-0.3163, 0.2761]",
-        "systematic_bias_ci": "[-0.9565, -0.3913]",
-        "binary_agreement_ci": "[0.9348, 1.0000]",
+        "pearson_r_ci": "[-0.2714, 0.2435]",
+        "spearman_rho_ci": "[-0.2751, 0.2653]",
+        "systematic_bias_ci": "[-0.9400, -0.3400]",
+        "binary_agreement_ci": "[0.9400, 1.0000]",
         "cohens_kappa_ci": "[0.0000, 0.0000]"
       },
       "zero_variance_detected": false,
       "per_dimension_agreement": {
         "correctness": {
-          "human_mean": 1.8043,
+          "human_mean": 1.82,
           "judge_mean": 1.5,
-          "mae": 0.6087,
-          "exact_match_rate": 0.3913
+          "mae": 0.6,
+          "exact_match_rate": 0.4
         },
         "tone": {
-          "human_mean": 1.913,
+          "human_mean": 1.9,
           "judge_mean": 2.0,
-          "mae": 0.087,
-          "exact_match_rate": 0.913
+          "mae": 0.1,
+          "exact_match_rate": 0.9
         },
         "actionability": {
-          "human_mean": 1.8261,
-          "judge_mean": 1.3696,
-          "mae": 0.6304,
-          "exact_match_rate": 0.3696
+          "human_mean": 1.82,
+          "judge_mean": 1.4,
+          "mae": 0.58,
+          "exact_match_rate": 0.42
         },
         "safety": {
           "human_mean": 1.0,
@@ -162,38 +162,38 @@
         }
       },
       "Escalation Precision": 1.0,
-      "Escalation Precision 95% CI": "[1.0000, 1.0000]",
-      "Escalation Recall": 0.7895,
-      "Escalation Recall 95% CI": "[0.6486, 0.9111]",
-      "Escalation F1": 0.8824,
-      "Escalation F1 95% CI": "[0.7869, 0.9535]",
+      "Escalation Precision 95% CI": "[0.0000, 1.0000]",
+      "Escalation Recall": 0.0526,
+      "Escalation Recall 95% CI": "[0.0000, 0.1316]",
+      "Escalation F1": 0.1,
+      "Escalation F1 95% CI": "[0.0000, 0.2326]",
       "Escalation Confusion Matrix": {
-        "TP": 30,
+        "TP": 2,
         "FP": 0,
-        "FN": 8,
+        "FN": 36,
         "TN": 162
       },
-      "Reply Coverage": 0.85,
+      "Reply Coverage": 0.99,
       "Reply Coverage 95% CI": "[0.7500, 0.8650]",
       "Reply Coverage 95% CI (Pct)": "[75.0%, 86.5%]",
-      "Escalation Coverage": 0.15,
+      "Escalation Coverage": 0.01,
       "Reply Safety Pass Rate": 1.0,
       "Reply Safety Violation Rate": 0.0,
-      "Mean Judge Score (0-7)": 6.11,
-      "Mean Judge Score 95% CI": "[6.0283, 6.1988]",
-      "Mean Reply Similarity": 0.1279,
-      "Mean Reply Similarity 95% CI": "[0.1170, 0.1403]",
+      "Mean Judge Score (0-7)": 6.15,
+      "Mean Judge Score 95% CI": "[6.0660, 6.2285]",
+      "Mean Reply Similarity": 0.1271,
+      "Mean Reply Similarity 95% CI": "[0.1172, 0.1378]",
       "quality_by_generation_mode": {
         "Evidence-Adapted-Fallback": {
-          "count": 145,
-          "mean_judge_score": 6.0345,
-          "mean_reply_similarity": 0.1305,
+          "count": 168,
+          "mean_judge_score": 6.0595,
+          "mean_reply_similarity": 0.1293,
           "safety_violation_rate": 0.0
         },
         "Template-Fallback": {
-          "count": 25,
-          "mean_judge_score": 6.56,
-          "mean_reply_similarity": 0.1129,
+          "count": 30,
+          "mean_judge_score": 6.6333,
+          "mean_reply_similarity": 0.1148,
           "safety_violation_rate": 0.0
         }
       },
@@ -205,15 +205,15 @@
           "safety_violation_rate": 0.0
         },
         "fallback_generated": {
-          "count": 170,
-          "mean_judge_score": 6.1118,
-          "mean_reply_similarity": 0.1279,
+          "count": 198,
+          "mean_judge_score": 6.1465,
+          "mean_reply_similarity": 0.1271,
           "safety_violation_rate": 0.0
         }
       },
-      "Secondary Composite Headline Score": 0.8636,
-      "Secondary Composite Headline Score 95% CI": "[0.8217, 0.8963]",
-      "Headline Score": 0.8636,
+      "Secondary Composite Headline Score": 0.5516,
+      "Secondary Composite Headline Score 95% CI": "[0.5043, 0.6090]",
+      "Headline Score": 0.5516,
       "headline_score_disclosure": "Reported strictly as a secondary internal composite dashboard metric. Primary benchmark claims lead with unweighted operational metrics and 95% bootstrap confidence intervals.",
       "bootstrap_ci_details": {
         "n_bootstraps": 1000,
@@ -227,42 +227,42 @@
           0.8842
         ],
         "escalation_precision_ci": [
-          1.0,
+          0.0,
           1.0
         ],
         "escalation_recall_ci": [
-          0.6486,
-          0.9111
+          0.0,
+          0.1316
         ],
         "escalation_f1_ci": [
-          0.7869,
-          0.9535
+          0.0,
+          0.2326
         ],
         "reply_coverage_ci": [
           0.75,
           0.865
         ],
         "mean_judge_score_ci": [
-          6.0283,
-          6.1988
+          6.066,
+          6.2285
         ],
         "mean_reply_similarity_ci": [
-          0.117,
-          0.1403
+          0.1172,
+          0.1378
         ],
         "secondary_composite_headline_score_ci": [
-          0.8217,
-          0.8963
+          0.5043,
+          0.609
         ]
       },
       "evaluator_mode_counts": {
-        "Heuristic Rubric Evaluator (Fallback)": 170,
-        "Skipped (Escalated)": 30
+        "Heuristic Rubric Evaluator (Fallback)": 198,
+        "Skipped (Escalated)": 2
       },
       "generation_mode_counts": {
-        "Evidence-Adapted-Fallback": 145,
-        "Escalated (No Reply)": 30,
-        "Template-Fallback": 25
+        "Evidence-Adapted-Fallback": 168,
+        "Template-Fallback": 30,
+        "Escalated (No Reply)": 2
       }
     },
     "Trivial Baseline": {

@@ -38,7 +38,7 @@ This document details 20 non-obvious engineering decisions made during the desig
 
 ### 9. Custom Operational Headline Score & Metric Separation
 - **Decision**: Defined the headline metric as $\text{Headline Score} = 0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscalationF1} + 0.20 \cdot (\text{MeanJudgeScore}/7)$.
-- **Rationale**: Combines routing performance (Intent Accuracy 84.0% & Escalation F1 88.24% across all items) with reply quality (`MeanJudgeScore` 6.11/7 computed strictly over generated replies). Includes an explicit `Reply Coverage` metric (85.0%) to evaluate auto-handling depth.
+- **Rationale**: Combines routing performance (Intent Accuracy 84.0% & Escalation F1 10.00% across all items) with reply quality (`MeanJudgeScore` 6.15/7 computed strictly over generated replies). Includes an explicit `Reply Coverage` metric (99.0%) to evaluate auto-handling depth.
 
 ### 10. Human Calibration Dataset & Evaluator Agreement (N=50)
 - **Decision**: Created a 50-item calibration scaffold (`golden/human_calibration.json`) with placeholder annotator identifiers (`human_annotator_1`, `human_annotator_2`), per-dimension rubric breakdowns (0-7 scale), and adjudication notes. Independent blind human annotation has not been externally verified.
