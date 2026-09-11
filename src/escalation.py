@@ -21,7 +21,7 @@ class EscalationEngine:
             'lawyer', 'sue', 'legal', 'fraud', 'stolen', 'police', 'injury', 'scam', 'court', 'attorney'
         ])
         
-        self.intent_risk_map = {
+        default_intent_risk_map = {
             'complaint_about_service': 0.70,
             'refund_request': 0.50,
             'damaged_wrong_item': 0.50,
@@ -31,6 +31,7 @@ class EscalationEngine:
             'order_status': 0.10,
             'general_inquiry': 0.10
         }
+        self.intent_risk_map = esc_cfg.get('intent_risk_map', default_intent_risk_map)
 
     def evaluate(self, customer_message: str, intent: str, intent_confidence: float,
                  context_messages: List[str] = None, retrieval_score: float = 0.0) -> Tuple[bool, float, str]:

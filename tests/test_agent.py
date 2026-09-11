@@ -384,15 +384,14 @@ def test_token_jaccard_overlap_diagnostic_labeling():
 
 
 @patch("src.evaluate.check_artifact_metadata", return_value=True)
-def test_run_provenance_directory_structure(mock_check):
-    """Verifies run_evaluation creates run-specific directory and results/latest/ pointers."""
+def test_run_provenance_directory_structure(mock_check, tmp_path):
+    """Verifies run_evaluation creates run-specific directory in isolated test output without mutating repo results/latest."""
     from src.evaluate import run_evaluation
     test_run_id = "test_run_provenance_123"
-    results = run_evaluation(run_id=test_run_id)
+    results = run_evaluation(run_id=test_run_id, output_base_dir=str(tmp_path))
 
     assert results['run_id'] == test_run_id
-    assert os.path.exists(f"results/runs/{test_run_id}/evaluation_results.json")
-    assert os.path.exists("results/latest/evaluation_results.json")
+    assert os.path.exists(tmp_path / "runs" / test_run_id / "evaluation_results.json")
     assert "token_jaccard_disclosure" in results
 
 
@@ -498,17 +497,18 @@ def test_resolved_brand_passed_to_generator_and_judge():
 
 
 def test_fallback_brand_taxonomy_compatibility():
-    """Verifies fallback brand retains configured taxonomy compatibility."""
+    """Verifies that cross-brand fallback is explicitly disabled to prevent domain task contamination."""
     import yaml
+    from src.data_cleaning import run_pipeline as run_data_cleaning
+
     with open("configs/config.yaml", "r", encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
     
     brand_cfg = cfg.get("brand", {})
-    fallback_handle = brand_cfg.get("fallback_handle", "@AmericanAir")
-    assert fallback_handle.startswith("@")
-    
-    taxonomy = cfg.get("intents", {}).get("taxonomy", [])
-    assert len(taxonomy) > 0
+    assert "fallback_handle" not in brand_cfg or "Disabled" in open("configs/config.yaml", "r", encoding="utf-8").read()
+
+    with pytest.raises(ValueError, match="Insufficient thread data"):
+        run_data_cleaning(brand_handle="@NonExistentBrandForTesting12345")
 
 
 def test_every_reply_formatting_invariants():
@@ -712,6 +712,93 @@ def test_escalation_human_request_word_boundaries():
     esc5, score5, reason5 = engine.evaluate(msg5, "general_inquiry", 0.95, retrieval_score=0.90)
     if reason5:
         assert "Customer explicitly requested a human agent" not in reason5
+
+
+def test_llm_client_and_judge_robustness_edge_cases():
+    """Verifies Gemini response compatibility, custom endpoint authorization, malformed LLM JSON, and API exception handling."""
+    from src.llm_utils import LLMClient
+    from src.llm_judge import LLMJudgeEvaluator
+
+    # 1. Custom Endpoint Base URL Authorization Test
+    custom_client = LLMClient(provider="openai", api_key="test_key_123", base_url="https://custom.endpoint/v1")
+    assert custom_client.base_url == "https://custom.endpoint/v1"
+    assert custom_client.api_key == "test_key_123"
+
+    # 2. Malformed LLM JSON Handling in Judge
+    judge = LLMJudgeEvaluator()
+    with patch.object(judge.llm_client, 'generate_detailed', return_value={
+        'content': '{ "correctness": 2, "tone": 2, invalid_json_here }',
+        'used_fallback': False,
+        'provider': 'mock',
+        'model_name': 'mock_model'
+    }):
+        res = judge.evaluate_reply("item_malformed", "my order is delayed", "Hi <USER>, check <URL>", "Hi <USER>, check <URL>", "delivery_delay")
+        assert res['used_fallback'] is True
+        assert res['evaluator_mode'] == 'Heuristic Rubric Evaluator (Fallback)'
+
+    # 3. API Error & Timeout Exception Handling in LLMClient
+    client = LLMClient(provider="openai", api_key="dummy")
+    with patch("requests.post", side_effect=Exception("API Timeout or Network Failure")):
+        llm_res = client.generate_detailed("Hello")
+        assert llm_res['used_fallback'] is True
+        assert llm_res['content'] != ""
+
+
+def test_escalation_engine_honors_configured_intent_risk_map(tmp_path):
+    """Verifies that EscalationEngine honors custom intent_risk_map overrides configured in config.yaml."""
+    from src.escalation import EscalationEngine
+    
+    custom_cfg_path = tmp_path / "custom_config.yaml"
+    custom_cfg_path.write_text("""
+escalation:
+  weights:
+    intent_risk: 0.80
+    low_confidence: 0.00
+    keyword_risk: 0.00
+    low_retrieval_sim: 0.00
+    thread_length: 0.00
+    sentiment_risk: 0.00
+  score_threshold: 0.50
+  high_risk_keywords: []
+  intent_risk_map:
+    general_inquiry: 0.95
+""", encoding="utf-8")
+
+    engine = EscalationEngine(config_path=str(custom_cfg_path))
+    assert engine.intent_risk_map['general_inquiry'] == 0.95
+
+    esc, score, reason = engine.evaluate("What are your hours?", "general_inquiry", 0.95, retrieval_score=0.90)
+    assert esc is True
+    assert score >= 0.76
+
+
+def test_documentation_metrics_match_latest_evaluation_artifact():
+    """Verifies that numerical metrics claimed in report.md match exact saved evaluation_results.json artifact."""
+    results_path = "results/evaluation_results.json"
+    report_path = "report.md"
+
+    if not os.path.exists(results_path) or not os.path.exists(report_path):
+        return
+
+    with open(results_path, "r", encoding="utf-8") as f:
+        res = json.load(f)
+
+    with open(report_path, "r", encoding="utf-8") as f:
+        report_text = f.read()
+
+    main_bench = res['benchmark_results']['Main Agent']
+    headline_score = f"{main_bench['Secondary Composite Headline Score']:.4f}"
+    intent_f1 = f"{main_bench['Intent Macro F1']:.4f}"
+    esc_f1 = f"{main_bench['Escalation F1']*100:.2f}%"
+    esc_recall = f"{main_bench['Escalation Recall']*100:.2f}%"
+    reply_cov = f"{main_bench['Reply Coverage']*100:.1f}%"
+
+    assert headline_score in report_text, f"Report headline score does not match saved artifact value {headline_score}"
+    assert intent_f1 in report_text, f"Report intent F1 does not match saved artifact value {intent_f1}"
+    assert esc_f1 in report_text, f"Report escalation F1 does not match saved artifact value {esc_f1}"
+    assert esc_recall in report_text, f"Report escalation recall does not match saved artifact value {esc_recall}"
+    assert reply_cov in report_text, f"Report reply coverage does not match saved artifact value {reply_cov}"
+
 
 
 

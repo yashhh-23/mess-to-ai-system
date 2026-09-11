@@ -383,19 +383,21 @@ def check_artifact_metadata(config_path: str = "configs/config.yaml", metadata_p
     print(f"[Artifact Validation] Freshness check PASSED — all {len(checks)} artifact checksums match active code/config/data. (Git SHA: {git_sha[:8]}, Trained: {trained_at}).")
     return True
 
-def run_evaluation(config_path: str = "configs/config.yaml", run_id: Optional[str] = None):
+def run_evaluation(config_path: str = "configs/config.yaml", run_id: Optional[str] = None, output_base_dir: Optional[str] = None):
     import time
     import shutil
     
     if run_id is None:
         run_id = time.strftime("%Y-%m-%dT%H%M%SZ", time.gmtime())
 
-    run_dir = f"results/runs/{run_id}"
+    base_results_dir = output_base_dir or "results"
+    run_dir = os.path.join(base_results_dir, "runs", run_id)
     os.makedirs(run_dir, exist_ok=True)
-    os.makedirs("results/latest", exist_ok=True)
+    if output_base_dir is None:
+        os.makedirs("results/latest", exist_ok=True)
     
-    run_audit_path = f"{run_dir}/judge_audit_log.jsonl"
-    run_results_path = f"{run_dir}/evaluation_results.json"
+    run_audit_path = os.path.join(run_dir, "judge_audit_log.jsonl")
+    run_results_path = os.path.join(run_dir, "evaluation_results.json")
 
     print(f"[Evaluation Harness] Initializing evaluation run: {run_id} (Directory: {run_dir})...")
     check_artifact_metadata(config_path=config_path)
@@ -898,19 +900,22 @@ def run_evaluation(config_path: str = "configs/config.yaml", run_id: Optional[st
     with open(run_results_path, 'w', encoding='utf-8') as f:
         json.dump(output_res, f, indent=2)
 
-    # 2. Save/copy to results/latest/
-    with open("results/latest/evaluation_results.json", 'w', encoding='utf-8') as f:
-        json.dump(output_res, f, indent=2)
-    if os.path.exists(run_audit_path):
-        shutil.copyfile(run_audit_path, "results/latest/judge_audit_log.jsonl")
+    if output_base_dir is None:
+        # 2. Save/copy to results/latest/
+        with open("results/latest/evaluation_results.json", 'w', encoding='utf-8') as f:
+            json.dump(output_res, f, indent=2)
+        if os.path.exists(run_audit_path):
+            shutil.copyfile(run_audit_path, "results/latest/judge_audit_log.jsonl")
 
-    # 3. Save/copy to top-level results/ for backwards compatibility
-    with open("results/evaluation_results.json", 'w', encoding='utf-8') as f:
-        json.dump(output_res, f, indent=2)
-    if os.path.exists(run_audit_path):
-        shutil.copyfile(run_audit_path, "results/judge_audit_log.jsonl")
+        # 3. Save/copy to top-level results/ for backwards compatibility
+        with open("results/evaluation_results.json", 'w', encoding='utf-8') as f:
+            json.dump(output_res, f, indent=2)
+        if os.path.exists(run_audit_path):
+            shutil.copyfile(run_audit_path, "results/judge_audit_log.jsonl")
         
-    print(f"[Evaluation Harness] Saved run {run_id} benchmark metrics to {run_results_path} and results/latest/.")
+        print(f"[Evaluation Harness] Saved run {run_id} benchmark metrics to {run_results_path} and results/latest/.")
+    else:
+        print(f"[Evaluation Harness] Saved isolated test run {run_id} benchmark metrics to {run_results_path}.")
     return output_res
 
 if __name__ == "__main__":
