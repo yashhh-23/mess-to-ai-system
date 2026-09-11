@@ -63,7 +63,7 @@ This document details 20 non-obvious engineering decisions made during the desig
 - **Rationale**: Prevents the LLM or evidence adaptation engine from producing invalid Twitter replies, exposing sensitive customer data, or making unverified financial promises.
 
 ### 15. Single Command Reproducibility Pipeline (`run_pipeline.py`) & Artifact Metadata Manifest
-- **Decision**: Implemented `run_pipeline.py` executing data ingestion, data cleaning, golden set verification, model training, indexing, and evaluation in sequence (< 90 seconds execution time), saving `models/model_metadata.json`.
+- **Decision**: Implemented `run_pipeline.py` executing data ingestion, data cleaning, golden set verification, model training, indexing, and evaluation in sequence (~25s execution time with pre-cached processed data, or under 15 minutes on fresh raw data download), saving `models/model_metadata.json`.
 - **Rationale**: Guarantees artifact freshness and eliminates stale artifact risk. `evaluate.py` verifies metadata manifest upon initialization.
 
 ### 16. Tightened Escalation Thread-Exhaustion Signal

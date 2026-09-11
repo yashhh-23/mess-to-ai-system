@@ -17,7 +17,7 @@ Each item in the golden set contains:
 
 ## 1. Intent Labeling Guidelines (`gold_intent`)
 
-Select exactly ONE primary intent from the 8 data-derived categories:
+Select exactly ONE primary intent from the 8 domain-designed and EDA-validated categories:
 
 | Intent Label | Definition & Typical Phrases | Borderline / Edge Cases |
 |---|---|---|

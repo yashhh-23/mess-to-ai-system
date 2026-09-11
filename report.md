@@ -31,8 +31,6 @@ Rather than presenting inflated offline accuracy figures, this project proves tr
 
 ## 2. Results vs Baselines
 
-## 2. Results vs Baselines
-
 ### 2.1 Primary Operational Benchmark Results with 95% Bootstrap CIs (N=200 Golden Set)
 All systems were evaluated on the exact same 200 Golden Set items using identical multi-turn thread inputs. Ground truth metrics exported directly from `results/evaluation_results.json`. Benchmark claims **lead with primary unweighted operational metrics and 95% non-parametric bootstrap confidence intervals (1,000 resamples)**:
 
