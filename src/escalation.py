@@ -54,17 +54,17 @@ class EscalationEngine:
                 
         # Explicit Human Request Trigger Check (Word Boundaries & Phrase Context Enforced)
         human_request_phrases = [
-            r"\b(speak|talk|connect|transfer|get|need)\s+(to|with)?\s*(a|an|the|any)?\s*(agent|human|representative|manager|supervisor|person)\b",
+            r"\b(speak|talk|connect|transfer|get|need)\s+(me\s+)?(to|with)?\s*(a|an|the|any)?\s*(agent|human|representative|manager|supervisor|person)\b",
             r"\bhuman representative\b",
             r"\blive representative\b",
             r"\bcustomer service representative\b",
             r"\breal person\b",
             r"\bhuman agent\b",
             r"\bhuman support\b",
-            r"\btransfer me\b",
-            r"\bconnect me\b",
             r"\b(speak|talk)\s+to\s+(a|an)?\s*(manager|supervisor)\b",
-            r"\b(want|need|get)\s+(a|an)?\s*(human|representative|agent|manager)\b"
+            r"\b(want|need|get)\s+(a|an)?\s*(human|representative|agent|manager)\b",
+            r"\btransfer me\b",
+            r"\bconnect me\b"
         ]
 
         for pat in human_request_phrases:
