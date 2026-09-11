@@ -681,5 +681,39 @@ def test_judge_weight_normalization_scale_lock():
     assert def_score == 7.0
 
 
+def test_escalation_human_request_word_boundaries():
+    """Verifies that human request escalation uses word boundaries, phrase context, and records exact trigger phrase."""
+    from src.escalation import EscalationEngine
+    engine = EscalationEngine()
+
+    # 1. Explicit human handoff requests -> MUST escalate with exact trigger phrase recorded
+    msg1 = "I need to speak to an agent right now"
+    esc1, score1, reason1 = engine.evaluate(msg1, "general_inquiry", 0.90)
+    assert esc1 is True
+    assert "triggered by 'speak to an agent'" in reason1
+
+    msg2 = "Please transfer me to a manager"
+    esc2, score2, reason2 = engine.evaluate(msg2, "general_inquiry", 0.90)
+    assert esc2 is True
+    assert "triggered by 'transfer me to a manager'" in reason2
+
+    msg3 = "I want to talk to a real person"
+    esc3, score3, reason3 = engine.evaluate(msg3, "general_inquiry", 0.90)
+    assert esc3 is True
+    assert "triggered by 'real person'" in reason3
+
+    # 2. Incidental word / substring usages -> MUST NOT trigger immediate explicit handoff escalation
+    msg4 = "The agent at the store gave me a receipt for my order"
+    esc4, score4, reason4 = engine.evaluate(msg4, "order_status", 0.95, retrieval_score=0.90)
+    if reason4:
+        assert "Customer explicitly requested a human agent" not in reason4
+
+    msg5 = "I have a management question regarding storefront policies"
+    esc5, score5, reason5 = engine.evaluate(msg5, "general_inquiry", 0.95, retrieval_score=0.90)
+    if reason5:
+        assert "Customer explicitly requested a human agent" not in reason5
+
+
+
 
 

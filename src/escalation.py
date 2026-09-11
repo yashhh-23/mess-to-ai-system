@@ -45,13 +45,32 @@ class EscalationEngine:
             
         text_lower = customer_message.lower()
         
-        # 1. Hard Keyword Risk Check
+        # 1. Hard Keyword Risk Check (Word Boundaries Enforced)
         for kw in self.high_risk_keywords:
-            if kw in text_lower:
+            pattern = r'\b' + re.escape(kw.lower()) + r'\b'
+            if re.search(pattern, text_lower):
                 return True, 1.0, f"Critical high-risk keyword detected: '{kw}'"
                 
-        if any(h in text_lower for h in ['human', 'representative', 'agent', 'real person', 'manager']):
-            return True, 0.95, "Customer explicitly requested a human agent"
+        # Explicit Human Request Trigger Check (Word Boundaries & Phrase Context Enforced)
+        human_request_phrases = [
+            r"\b(speak|talk|connect|transfer|get|need)\s+(to|with)?\s*(a|an|the|any)?\s*(agent|human|representative|manager|supervisor|person)\b",
+            r"\bhuman representative\b",
+            r"\blive representative\b",
+            r"\bcustomer service representative\b",
+            r"\breal person\b",
+            r"\bhuman agent\b",
+            r"\bhuman support\b",
+            r"\btransfer me\b",
+            r"\bconnect me\b",
+            r"\b(speak|talk)\s+to\s+(a|an)?\s*(manager|supervisor)\b",
+            r"\b(want|need|get)\s+(a|an)?\s*(human|representative|agent|manager)\b"
+        ]
+
+        for pat in human_request_phrases:
+            match = re.search(pat, text_lower)
+            if match:
+                matched_phrase = match.group(0).strip()
+                return True, 0.95, f"Customer explicitly requested a human agent (triggered by '{matched_phrase}')"
 
         # 2. Multi-Signal Scoring Computation
         intent_risk = self.intent_risk_map.get(intent, 0.20)
