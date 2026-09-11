@@ -124,6 +124,10 @@ def execute_master_pipeline(config_path: str = "configs/config.yaml"):
         'retrieval_indexed_conversation_ids': retrieval_indexed_ids
     }
 
+    # Generate run_id for evaluation provenance tracking
+    run_id = time.strftime("%Y-%m-%dT%H%M%SZ", time.gmtime())
+    run_dir = os.path.join("results", "runs", run_id)
+
     # Save Model Artifact Metadata Manifest
     manifest_checksum = compute_file_hash("data/raw/data_manifest.json")
     metadata_path = "models/model_metadata.json"
