@@ -36,27 +36,57 @@ def get_git_commit_sha() -> str:
     except Exception:
         return "NO_GIT_REPO"
 
-def execute_master_pipeline(config_path: str = "configs/config.yaml"):
+import argparse
+
+def execute_master_pipeline(config_path: str = "configs/config.yaml", mode: str = "full"):
     """
     Master Reproducibility Pipeline:
-    Runs Data Ingest -> Data Cleaning -> Golden Set Verification -> Model Training -> Vector Indexing -> Benchmark Evaluation.
-    Saves auditable artifact metadata manifest to models/model_metadata.json.
+    Supports modes:
+    - 'full' / 'rebuild': Data Ingest -> Cleaning -> Golden Verification -> Training -> Indexing -> Evaluation.
+    - 'eval' / 'evaluate-existing': Runs benchmark evaluation on existing committed artifacts.
+    - 'train': Runs cleaning, training, and indexing, skipping data download if raw CSV is absent but manifest is trusted.
     """
     print("\n==========================================================================================")
-    print("                STARTING MASTER REPRODUCIBILITY PIPELINE (UNDER 15 MINS)                 ")
+    print(f"       STARTING MASTER REPRODUCIBILITY PIPELINE (Mode: {mode.upper()})       ")
     print("==========================================================================================")
     start_time = time.time()
 
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
 
+    if mode in ["eval", "evaluate-existing"]:
+        print("\n[Evaluation-Only Mode] Skipping retraining. Executing evaluation harness on committed artifacts...")
+        results = run_evaluation(config_path=config_path)
+        elapsed = time.time() - start_time
+        print(f"\n[Evaluation Complete] Total Execution Time: {elapsed:.2f} seconds.")
+        return results
+
     # 1. Download / Ingest Data
+    raw_path = config['paths']['raw_data']
+    manifest_path = "data/raw/data_manifest.json"
+    raw_absent = not os.path.exists(raw_path)
+
     print("\n[Step 1/7] Data Acquisition & Schema Validation...")
-    raw_csv = download_twitter_support_data(output_path=config['paths']['raw_data'])
+    if not raw_absent:
+        raw_csv = download_twitter_support_data(output_path=raw_path)
+    else:
+        try:
+            raw_csv = download_twitter_support_data(output_path=raw_path)
+            raw_absent = False
+        except Exception as e:
+            if os.path.exists(manifest_path):
+                print(f"[Pipeline Warning] Raw CSV absent ({raw_path}) and download unavailable ({e}). "
+                      f"Trusted data manifest found at '{manifest_path}'. Proceeding with pipeline using processed data.")
+            else:
+                raise
 
     # 2. Clean Data & Reconstruct Threads
     print("\n[Step 2/7] Data Cleaning & Multi-Turn Thread Extraction...")
-    processed_jsonl = run_data_cleaning(config_path=config_path)
+    if not raw_absent and os.path.exists(raw_path):
+        processed_jsonl = run_data_cleaning(config_path=config_path)
+    else:
+        processed_jsonl = config['paths']['processed_data']
+        print(f"[Data Cleaning] Raw CSV absent; using existing processed dataset at '{processed_jsonl}'.")
     
     brand_meta_path = os.path.join(os.path.dirname(processed_jsonl), "brand_metadata.json")
     resolved_brand = "@AmazonHelp"
@@ -98,6 +128,7 @@ def execute_master_pipeline(config_path: str = "configs/config.yaml"):
     # Compute training class distribution
     with open(processed_jsonl, 'r', encoding='utf-8') as f:
         threads = [json.loads(line) for line in f]
+
     with open(config['paths']['golden_set'], 'r', encoding='utf-8') as f:
         golden_ids = {json.loads(line)['conversation_id'] for line in f}
 
@@ -129,9 +160,7 @@ def execute_master_pipeline(config_path: str = "configs/config.yaml"):
     run_dir = os.path.join("results", "runs", run_id)
 
     # Save Model Artifact Metadata Manifest
-    manifest_checksum = compute_file_hash("data/raw/data_manifest.json")
-    raw_data_path = config['paths']['raw_data']
-    raw_absent = not os.path.exists(raw_data_path)
+    manifest_checksum = compute_file_hash(manifest_path)
     metadata_path = "models/model_metadata.json"
     metadata = {
         'run_id': run_id,
@@ -153,7 +182,7 @@ def execute_master_pipeline(config_path: str = "configs/config.yaml"):
         'train_class_distribution': class_dist,
         'data_leakage_guard': data_leakage_guard_info,
         'config_hash': compute_file_hash(config_path),
-        'raw_data_checksum': compute_file_hash(config['paths']['raw_data']),
+        'raw_data_checksum': compute_file_hash(raw_path),
         'dataset_manifest_checksum': manifest_checksum,
         'processed_data_checksum': compute_file_hash(processed_jsonl),
         'golden_set_checksum': compute_file_hash(config['paths']['golden_set']),
@@ -178,4 +207,10 @@ def execute_master_pipeline(config_path: str = "configs/config.yaml"):
     return results
 
 if __name__ == "__main__":
-    execute_master_pipeline()
+    parser = argparse.ArgumentParser(description="Master Reproducibility Pipeline & Evaluation Harness")
+    parser.add_argument("--mode", type=str, choices=["full", "eval", "evaluate-existing", "train", "rebuild"], default="full",
+                        help="Pipeline execution mode: 'full'/'rebuild' (default), 'eval'/'evaluate-existing', 'train'")
+    parser.add_argument("--config", type=str, default="configs/config.yaml", help="Path to system config.yaml")
+    args = parser.parse_args()
+    
+    execute_master_pipeline(config_path=args.config, mode=args.mode)

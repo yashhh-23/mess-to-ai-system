@@ -21,9 +21,10 @@ def sample_calibration_candidates(golden_path: str = "golden/golden_set.jsonl",
     sampled = [golden_items[i] for i in indices]
 
     export_records = []
-    for item in sampled:
+    for idx, item in enumerate(sampled, start=1):
         export_records.append({
-            'item_id': item.get('id'),
+            'item_id': f'calib_{idx:03d}',
+            'golden_ref_id': item.get('id'),
             'conversation_id': item.get('conversation_id'),
             'customer_message': item.get('customer_message'),
             'context_messages': item.get('context_messages', []),

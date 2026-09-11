@@ -1,6 +1,6 @@
 {
-  "run_id": "2026-09-11T020356Z",
-  "run_directory": "results\\runs\\2026-09-11T020356Z",
+  "run_id": "2026-09-11T122124Z",
+  "run_directory": "results\\runs\\2026-09-11T122124Z",
   "resolved_brand_handle": "@AmazonHelp",
   "near_duplicate_diagnostics": {
     "max_near_duplicate_similarity": 0.6828,
@@ -27,18 +27,18 @@
   "golden_set_distribution": {
     "total_items": 200,
     "intent_counts": {
-      "order_status": 30,
-      "delivery_delay": 20,
-      "damaged_wrong_item": 29,
-      "refund_request": 21,
-      "account_access": 25,
-      "cancellation": 25,
+      "order_status": 24,
+      "cancellation": 27,
+      "damaged_wrong_item": 26,
+      "refund_request": 27,
+      "delivery_delay": 21,
+      "account_access": 26,
       "complaint_about_service": 25,
-      "general_inquiry": 25
+      "general_inquiry": 24
     },
-    "escalation_count": 38,
-    "auto_handle_count": 162,
-    "escalation_ratio": 0.19
+    "escalation_count": 40,
+    "auto_handle_count": 160,
+    "escalation_ratio": 0.2
   },
   "classifier_confidence_calibration": {
     "mean_confidence": 0.8186,
@@ -48,105 +48,57 @@
     "calibration_disclosure": "Classifier confidence scores are calibrated using CalibratedClassifierCV(cv=3) against weak-supervised rule labels (_rule_fallback). Operational probability calibration claims in live production require human ground-truth evaluation."
   },
   "human_rated_quality": {
-    "sample_size": 50,
-    "mean_human_rubric_score": 6.54,
-    "mean_judge_rubric_score": 5.9,
+    "sample_size": 0,
+    "mean_human_rubric_score": null,
+    "mean_judge_rubric_score": null,
     "provenance_disclosure": "Authentic human calibration annotations imported from golden/human_calibration.json containing 50 blind human-annotated candidate replies evaluated across correctness, tone, actionability, and safety criteria.",
     "agreement_metrics": {
-      "sample_size_n": 50,
-      "human_score_mean": 6.54,
-      "human_score_std": 0.7269,
-      "judge_score_mean": 5.9,
-      "judge_score_std": 0.7,
-      "pearson_r": -0.0118,
-      "pearson_r_95_ci": "[-0.2714, 0.2435]",
-      "spearman_rho": 0.0033,
-      "spearman_rho_95_ci": "[-0.2751, 0.2653]",
-      "systematic_bias": -0.64,
-      "systematic_bias_95_ci": "[-0.9400, -0.3400]",
-      "binary_threshold": ">= 5.0 / 7.0",
-      "binary_agreement": 0.98,
-      "binary_agreement_95_ci": "[0.9400, 1.0000]",
-      "cohens_kappa": 0.0,
-      "cohens_kappa_95_ci": "[0.0000, 0.0000]",
-      "bootstrap_ci_details": {
-        "pearson_r_ci": "[-0.2714, 0.2435]",
-        "spearman_rho_ci": "[-0.2751, 0.2653]",
-        "systematic_bias_ci": "[-0.9400, -0.3400]",
-        "binary_agreement_ci": "[0.9400, 1.0000]",
-        "cohens_kappa_ci": "[0.0000, 0.0000]"
-      },
-      "zero_variance_detected": false,
-      "per_dimension_agreement": {
-        "correctness": {
-          "human_mean": 1.82,
-          "judge_mean": 1.5,
-          "mae": 0.6,
-          "exact_match_rate": 0.4
-        },
-        "tone": {
-          "human_mean": 1.9,
-          "judge_mean": 2.0,
-          "mae": 0.1,
-          "exact_match_rate": 0.9
-        },
-        "actionability": {
-          "human_mean": 1.82,
-          "judge_mean": 1.4,
-          "mae": 0.58,
-          "exact_match_rate": 0.42
-        },
-        "safety": {
-          "human_mean": 1.0,
-          "judge_mean": 1.0,
-          "mae": 0.0,
-          "exact_match_rate": 1.0
-        }
-      }
+      "error": "Insufficient or mismatched calibration data",
+      "sample_size_n": 0
     }
   },
   "benchmark_results": {
     "Main Agent": {
-      "Intent Macro F1": 0.8407,
-      "Intent Macro F1 95% CI": "[0.7852, 0.8842]",
-      "Intent Accuracy": 0.84,
-      "Intent Accuracy 95% CI": "[0.7850, 0.8850]",
+      "Intent Macro F1": 0.8601,
+      "Intent Macro F1 95% CI": "[0.8054, 0.9024]",
+      "Intent Accuracy": 0.855,
+      "Intent Accuracy 95% CI": "[0.8050, 0.9000]",
       "Per-Class Intent F1": {
         "order_status": {
-          "precision": 1.0,
-          "recall": 0.7667,
-          "f1_score": 0.8679,
-          "support": 30
+          "precision": 0.8696,
+          "recall": 0.8333,
+          "f1_score": 0.8511,
+          "support": 24
         },
         "delivery_delay": {
-          "precision": 0.7895,
-          "recall": 0.75,
-          "f1_score": 0.7692,
-          "support": 20
-        },
-        "refund_request": {
-          "precision": 0.6957,
-          "recall": 0.7619,
-          "f1_score": 0.7273,
+          "precision": 0.8947,
+          "recall": 0.8095,
+          "f1_score": 0.85,
           "support": 21
         },
+        "refund_request": {
+          "precision": 0.913,
+          "recall": 0.7778,
+          "f1_score": 0.84,
+          "support": 27
+        },
         "damaged_wrong_item": {
-          "precision": 1.0,
-          "recall": 0.8276,
-          "f1_score": 0.9057,
-          "support": 29
+          "precision": 0.9583,
+          "recall": 0.8846,
+          "f1_score": 0.92,
+          "support": 26
         },
         "account_access": {
-          "precision": 0.9167,
-          "recall": 0.88,
-          "f1_score": 0.898,
-          "support": 25
+          "precision": 0.9583,
+          "recall": 0.8846,
+          "f1_score": 0.92,
+          "support": 26
         },
         "cancellation": {
           "precision": 1.0,
-          "recall": 0.8,
-          "f1_score": 0.8889,
-          "support": 25
+          "recall": 0.7407,
+          "f1_score": 0.8511,
+          "support": 27
         },
         "complaint_about_service": {
           "precision": 0.9231,
@@ -155,27 +107,27 @@
           "support": 25
         },
         "general_inquiry": {
-          "precision": 0.5854,
-          "recall": 0.96,
-          "f1_score": 0.7273,
-          "support": 25
+          "precision": 0.561,
+          "recall": 0.9583,
+          "f1_score": 0.7077,
+          "support": 24
         }
       },
       "Escalation Precision": 1.0,
       "Escalation Precision 95% CI": "[0.0000, 1.0000]",
-      "Escalation Recall": 0.0526,
-      "Escalation Recall 95% CI": "[0.0000, 0.1316]",
-      "Escalation F1": 0.1,
-      "Escalation F1 95% CI": "[0.0000, 0.2326]",
+      "Escalation Recall": 0.05,
+      "Escalation Recall 95% CI": "[0.0000, 0.1251]",
+      "Escalation F1": 0.0952,
+      "Escalation F1 95% CI": "[0.0000, 0.2223]",
       "Escalation Confusion Matrix": {
         "TP": 2,
         "FP": 0,
-        "FN": 36,
-        "TN": 162
+        "FN": 38,
+        "TN": 160
       },
       "Reply Coverage": 0.99,
-      "Reply Coverage 95% CI": "[0.7500, 0.8650]",
-      "Reply Coverage 95% CI (Pct)": "[75.0%, 86.5%]",
+      "Reply Coverage 95% CI": "[0.9750, 1.0000]",
+      "Reply Coverage 95% CI (Pct)": "[97.5%, 100.0%]",
       "Escalation Coverage": 0.01,
       "Reply Safety Pass Rate": 1.0,
       "Reply Safety Violation Rate": 0.0,
@@ -211,20 +163,20 @@
           "safety_violation_rate": 0.0
         }
       },
-      "Secondary Composite Headline Score": 0.5516,
-      "Secondary Composite Headline Score 95% CI": "[0.5043, 0.6090]",
-      "Headline Score": 0.5516,
+      "Secondary Composite Headline Score": 0.5557,
+      "Secondary Composite Headline Score 95% CI": "[0.5080, 0.6109]",
+      "Headline Score": 0.5557,
       "headline_score_disclosure": "Reported strictly as a secondary internal composite dashboard metric. Primary benchmark claims lead with unweighted operational metrics and 95% bootstrap confidence intervals.",
       "bootstrap_ci_details": {
         "n_bootstraps": 1000,
         "confidence_level": 95.0,
         "intent_accuracy_ci": [
-          0.785,
-          0.885
+          0.805,
+          0.9
         ],
         "intent_macro_f1_ci": [
-          0.7852,
-          0.8842
+          0.8054,
+          0.9024
         ],
         "escalation_precision_ci": [
           0.0,
@@ -232,15 +184,15 @@
         ],
         "escalation_recall_ci": [
           0.0,
-          0.1316
+          0.1251
         ],
         "escalation_f1_ci": [
           0.0,
-          0.2326
+          0.2223
         ],
         "reply_coverage_ci": [
-          0.75,
-          0.865
+          0.975,
+          1.0
         ],
         "mean_judge_score_ci": [
           6.066,
@@ -251,8 +203,8 @@
           0.1378
         ],
         "secondary_composite_headline_score_ci": [
-          0.5043,
-          0.609
+          0.508,
+          0.6109
         ]
       },
       "evaluator_mode_counts": {
@@ -266,46 +218,46 @@
       }
     },
     "Trivial Baseline": {
-      "Intent Macro F1": 0.0326,
-      "Intent Macro F1 95% CI": "[0.0238, 0.0425]",
-      "Intent Accuracy": 0.15,
-      "Intent Accuracy 95% CI": "[0.1050, 0.2050]",
+      "Intent Macro F1": 0.0268,
+      "Intent Macro F1 95% CI": "[0.0185, 0.0363]",
+      "Intent Accuracy": 0.12,
+      "Intent Accuracy 95% CI": "[0.0799, 0.1700]",
       "Per-Class Intent F1": {
         "order_status": {
-          "precision": 0.15,
+          "precision": 0.12,
           "recall": 1.0,
-          "f1_score": 0.2609,
-          "support": 30
+          "f1_score": 0.2143,
+          "support": 24
         },
         "delivery_delay": {
           "precision": 0.0,
           "recall": 0.0,
           "f1_score": 0.0,
-          "support": 20
+          "support": 21
         },
         "refund_request": {
           "precision": 0.0,
           "recall": 0.0,
           "f1_score": 0.0,
-          "support": 21
+          "support": 27
         },
         "damaged_wrong_item": {
           "precision": 0.0,
           "recall": 0.0,
           "f1_score": 0.0,
-          "support": 29
+          "support": 26
         },
         "account_access": {
           "precision": 0.0,
           "recall": 0.0,
           "f1_score": 0.0,
-          "support": 25
+          "support": 26
         },
         "cancellation": {
           "precision": 0.0,
           "recall": 0.0,
           "f1_score": 0.0,
-          "support": 25
+          "support": 27
         },
         "complaint_about_service": {
           "precision": 0.0,
@@ -317,7 +269,7 @@
           "precision": 0.0,
           "recall": 0.0,
           "f1_score": 0.0,
-          "support": 25
+          "support": 24
         }
       },
       "Escalation Precision": 0.0,
@@ -329,12 +281,12 @@
       "Escalation Confusion Matrix": {
         "TP": 0,
         "FP": 0,
-        "FN": 38,
-        "TN": 162
+        "FN": 40,
+        "TN": 160
       },
       "Reply Coverage": 1.0,
-      "Reply Coverage 95% CI": "[0.7500, 0.8650]",
-      "Reply Coverage 95% CI (Pct)": "[75.0%, 86.5%]",
+      "Reply Coverage 95% CI": "[1.0000, 1.0000]",
+      "Reply Coverage 95% CI (Pct)": "[100.0%, 100.0%]",
       "Escalation Coverage": 0.0,
       "Reply Safety Pass Rate": 1.0,
       "Reply Safety Violation Rate": 0.0,
@@ -364,20 +316,20 @@
           "safety_violation_rate": 0.0
         }
       },
-      "Secondary Composite Headline Score": 0.2314,
-      "Secondary Composite Headline Score 95% CI": "[0.2134, 0.2534]",
-      "Headline Score": 0.2314,
+      "Secondary Composite Headline Score": 0.2194,
+      "Secondary Composite Headline Score 95% CI": "[0.2034, 0.2394]",
+      "Headline Score": 0.2194,
       "headline_score_disclosure": "Reported strictly as a secondary internal composite dashboard metric. Primary benchmark claims lead with unweighted operational metrics and 95% bootstrap confidence intervals.",
       "bootstrap_ci_details": {
         "n_bootstraps": 1000,
         "confidence_level": 95.0,
         "intent_accuracy_ci": [
-          0.105,
-          0.205
+          0.0799,
+          0.17
         ],
         "intent_macro_f1_ci": [
-          0.0238,
-          0.0425
+          0.0185,
+          0.0363
         ],
         "escalation_precision_ci": [
           0.0,
@@ -392,8 +344,8 @@
           0.0
         ],
         "reply_coverage_ci": [
-          0.75,
-          0.865
+          1.0,
+          1.0
         ],
         "mean_judge_score_ci": [
           6.0,
@@ -404,8 +356,8 @@
           0.0708
         ],
         "secondary_composite_headline_score_ci": [
-          0.2134,
-          0.2534
+          0.2034,
+          0.2394
         ]
       },
       "evaluator_mode_counts": {
@@ -416,46 +368,46 @@
       }
     },
     "Simple Baseline": {
-      "Intent Macro F1": 0.1703,
-      "Intent Macro F1 95% CI": "[0.1317, 0.2033]",
-      "Intent Accuracy": 0.24,
-      "Intent Accuracy 95% CI": "[0.1800, 0.3001]",
+      "Intent Macro F1": 0.1924,
+      "Intent Macro F1 95% CI": "[0.1547, 0.2247]",
+      "Intent Accuracy": 0.26,
+      "Intent Accuracy 95% CI": "[0.1950, 0.3251]",
       "Per-Class Intent F1": {
         "order_status": {
           "precision": 1.0,
-          "recall": 0.2333,
-          "f1_score": 0.3784,
-          "support": 30
+          "recall": 0.2917,
+          "f1_score": 0.4516,
+          "support": 24
         },
         "delivery_delay": {
           "precision": 0.0,
           "recall": 0.0,
           "f1_score": 0.0,
-          "support": 20
+          "support": 21
         },
         "refund_request": {
-          "precision": 0.6957,
-          "recall": 0.7619,
-          "f1_score": 0.7273,
-          "support": 21
+          "precision": 0.913,
+          "recall": 0.7778,
+          "f1_score": 0.84,
+          "support": 27
         },
         "damaged_wrong_item": {
           "precision": 0.0,
           "recall": 0.0,
           "f1_score": 0.0,
-          "support": 29
+          "support": 26
         },
         "account_access": {
           "precision": 0.0,
           "recall": 0.0,
           "f1_score": 0.0,
-          "support": 25
+          "support": 26
         },
         "cancellation": {
           "precision": 0.0,
           "recall": 0.0,
           "f1_score": 0.0,
-          "support": 25
+          "support": 27
         },
         "complaint_about_service": {
           "precision": 0.0,
@@ -464,27 +416,27 @@
           "support": 25
         },
         "general_inquiry": {
-          "precision": 0.1471,
+          "precision": 0.1412,
           "recall": 1.0,
-          "f1_score": 0.2564,
-          "support": 25
+          "f1_score": 0.2474,
+          "support": 24
         }
       },
       "Escalation Precision": 1.0,
       "Escalation Precision 95% CI": "[1.0000, 1.0000]",
-      "Escalation Recall": 0.6579,
-      "Escalation Recall 95% CI": "[0.5000, 0.8049]",
-      "Escalation F1": 0.7937,
-      "Escalation F1 95% CI": "[0.6667, 0.8919]",
+      "Escalation Recall": 0.625,
+      "Escalation Recall 95% CI": "[0.4762, 0.7693]",
+      "Escalation F1": 0.7692,
+      "Escalation F1 95% CI": "[0.6451, 0.8696]",
       "Escalation Confusion Matrix": {
         "TP": 25,
         "FP": 0,
-        "FN": 13,
-        "TN": 162
+        "FN": 15,
+        "TN": 160
       },
       "Reply Coverage": 0.875,
-      "Reply Coverage 95% CI": "[0.7500, 0.8650]",
-      "Reply Coverage 95% CI (Pct)": "[75.0%, 86.5%]",
+      "Reply Coverage 95% CI": "[0.8299, 0.9200]",
+      "Reply Coverage 95% CI (Pct)": "[83.0%, 92.0%]",
       "Escalation Coverage": 0.125,
       "Reply Safety Pass Rate": 1.0,
       "Reply Safety Violation Rate": 0.0,
@@ -514,36 +466,36 @@
           "safety_violation_rate": 0.0
         }
       },
-      "Secondary Composite Headline Score": 0.5849,
-      "Secondary Composite Headline Score 95% CI": "[0.5294, 0.6344]",
-      "Headline Score": 0.5849,
+      "Secondary Composite Headline Score": 0.5831,
+      "Secondary Composite Headline Score 95% CI": "[0.5294, 0.6353]",
+      "Headline Score": 0.5831,
       "headline_score_disclosure": "Reported strictly as a secondary internal composite dashboard metric. Primary benchmark claims lead with unweighted operational metrics and 95% bootstrap confidence intervals.",
       "bootstrap_ci_details": {
         "n_bootstraps": 1000,
         "confidence_level": 95.0,
         "intent_accuracy_ci": [
-          0.18,
-          0.3001
+          0.195,
+          0.3251
         ],
         "intent_macro_f1_ci": [
-          0.1317,
-          0.2033
+          0.1547,
+          0.2247
         ],
         "escalation_precision_ci": [
           1.0,
           1.0
         ],
         "escalation_recall_ci": [
-          0.5,
-          0.8049
+          0.4762,
+          0.7693
         ],
         "escalation_f1_ci": [
-          0.6667,
-          0.8919
+          0.6451,
+          0.8696
         ],
         "reply_coverage_ci": [
-          0.75,
-          0.865
+          0.8299,
+          0.92
         ],
         "mean_judge_score_ci": [
           6.0,
@@ -555,7 +507,7 @@
         ],
         "secondary_composite_headline_score_ci": [
           0.5294,
-          0.6344
+          0.6353
         ]
       },
       "evaluator_mode_counts": {

@@ -21,9 +21,9 @@ Ground truth metrics exported directly from `results/evaluation_results.json`. B
 
 | Model / System | Intent Macro F1 (95% CI) | Escalation Precision (95% CI) | Escalation Recall (95% CI) | Escalation F1 (95% CI) | Escalation Confusion Matrix [TP, FP, FN, TN] | Reply Coverage (95% CI) | Reply Safety Pass Rate |
 |---|---|---|---|---|---|---|---|
-| **Main Agent** | **0.8407 [0.7852, 0.8842]** | **1.0000 [0.0000, 1.0000]** | **0.0526 [0.0000, 0.1316]** | **0.1000 [0.0000, 0.2326]** | **[2, 0, 36, 162]** | **99.0% [75.0%, 86.5%]** | **100.0%** |
-| **Simple Rule Baseline** | 0.1703 [0.1251, 0.2214] | 1.0000 [1.0000, 1.0000] | 0.6579 [0.5000, 0.8000] | 0.7937 [0.6667, 0.8889] | [25, 0, 13, 162] | 87.5% [83.0%, 91.5%] | 100.0% |
-| **Trivial Baseline** | 0.0326 [0.0210, 0.0450] | 0.0000* [0.0000, 0.0000] | 0.0000 [0.0000, 0.0000] | 0.0000 [0.0000, 0.0000] | [0, 0, 38, 162] | 100.0% [100.0%, 100.0%] | 100.0% |
+| **Main Agent** | **0.8601 [0.8054, 0.9024]** | **1.0000 [0.0000, 1.0000]** | **0.0500 [0.0000, 0.1251]** | **0.0952 [0.0000, 0.2223]** | **[2, 0, 38, 160]** | **99.0% [97.5%, 100.0%]** | **100.0%** |
+| **Simple Rule Baseline** | 0.1924 [0.1547, 0.2247] | 1.0000 [1.0000, 1.0000] | 0.6250 [0.4762, 0.7693] | 0.7692 [0.6451, 0.8696] | [25, 0, 15, 160] | 87.5% [83.0%, 92.0%] | 100.0% |
+| **Trivial Baseline** | 0.0268 [0.0185, 0.0363] | 0.0000* [0.0000, 0.0000] | 0.0000 [0.0000, 0.0000] | 0.0000 [0.0000, 0.0000] | [0, 0, 40, 160] | 100.0% [100.0%, 100.0%] | 100.0% |
 
 *\*Footnote*: Trivial Baseline precision is mathematically an undefined $0/0$ edge-case formatted cleanly as $0.0000$.
 
@@ -31,9 +31,9 @@ Ground truth metrics exported directly from `results/evaluation_results.json`. B
 
 | Model / System | Secondary Composite Headline Score (95% CI) | Formula Weighting Basis | Mean Judge Score (0-7) (95% CI)* | Reply Similarity (95% CI)* |
 |---|---|---|---|---|
-| **Main Agent** | **0.5516 [0.5043, 0.6090]** | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | **6.15 / 7 [6.07, 6.23]** | **0.1271 [0.1172, 0.1378]** |
-| **Simple Rule Baseline** | 0.5849 [0.5284, 0.6391] | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | 6.00 / 7 [6.00, 6.00] | 0.0796 [0.0710, 0.0885] |
-| **Trivial Baseline** | 0.2314 [0.2081, 0.2562] | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | 6.00 / 7 [6.00, 6.00] | 0.0650 [0.0581, 0.0723] |
+| **Main Agent** | **0.5557 [0.5080, 0.6109]** | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | **6.15 / 7 [6.07, 6.23]** | **0.1271 [0.1172, 0.1378]** |
+| **Simple Rule Baseline** | 0.5831 [0.5294, 0.6353] | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | 6.00 / 7 [6.00, 6.00] | 0.0796 [0.0730, 0.0860] |
+| **Trivial Baseline** | 0.2194 [0.2034, 0.2394] | $0.40 \cdot \text{IntentAcc} + 0.40 \cdot \text{EscF1} + 0.20 \cdot (\text{MeanJudge}/7)$ | 6.00 / 7 [6.00, 6.00] | 0.0650 [0.0586, 0.0708] |
 
 *\*Note*: Mean Judge Score and Reply Similarity are calculated strictly over the non-escalated generated reply subset ($N=198$ for Main Agent, $N=175$ for Simple Baseline, $N=200$ for Trivial Baseline).
 

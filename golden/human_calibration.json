@@ -1,7 +1,7 @@
 [
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_001",
+    "item_id": "calib_001",
     "conversation_id": "conv_426301",
     "customer_message": "@AmazonHelp Than simply track the order id and get delivered to the given address.",
     "annotator_id": "human_annotator_1",
@@ -19,7 +19,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_002",
+    "item_id": "calib_002",
     "conversation_id": "conv_315317",
     "customer_message": "@AmazonHelp The order confirmation email says \u2018arriving 6th October\u2019.",
     "annotator_id": "human_annotator_1",
@@ -37,7 +37,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_003",
+    "item_id": "calib_003",
     "conversation_id": "conv_180957",
     "customer_message": "@AmazonHelp I have share details already. What should I do ? Can I cancel the order ? If I cancel , may be you will refund my money after 1 month",
     "annotator_id": "human_annotator_1",
@@ -55,7 +55,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_004",
+    "item_id": "calib_004",
     "conversation_id": "conv_290112",
     "customer_message": "@AmazonHelp My order #112-984371 is delayed by 3 days. Where is it?",
     "annotator_id": "human_annotator_1",
@@ -73,7 +73,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_005",
+    "item_id": "calib_005",
     "conversation_id": "conv_551029",
     "customer_message": "@AmazonHelp I was charged twice for my Prime membership! Refund my money immediately!",
     "annotator_id": "human_annotator_1",
@@ -91,7 +91,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_006",
+    "item_id": "calib_006",
     "conversation_id": "conv_661033",
     "customer_message": "@AmazonHelp Package arrived completely shattered! Box was crushed.",
     "annotator_id": "human_annotator_1",
@@ -109,7 +109,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_007",
+    "item_id": "calib_007",
     "conversation_id": "conv_771044",
     "customer_message": "@AmazonHelp Your delivery driver threw the box over my gate and broke my lamp! I will sue your company!",
     "annotator_id": "human_annotator_1",
@@ -127,7 +127,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_008",
+    "item_id": "calib_008",
     "conversation_id": "conv_881055",
     "customer_message": "@AmazonHelp How do I change my default shipping address for future orders?",
     "annotator_id": "human_annotator_1",
@@ -145,7 +145,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_009",
+    "item_id": "calib_009",
     "conversation_id": "conv_991066",
     "customer_message": "@AmazonHelp Can't log into my account. Password reset link is not arriving.",
     "annotator_id": "human_annotator_1",
@@ -163,7 +163,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_010",
+    "item_id": "calib_010",
     "conversation_id": "conv_101077",
     "customer_message": "@AmazonHelp Still haven't received order #204-1192837. Tracking hasn't updated in 4 days.",
     "annotator_id": "human_annotator_1",
@@ -181,7 +181,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_011",
+    "item_id": "calib_011",
     "conversation_id": "conv_111088",
     "customer_message": "@AmazonHelp Want to cancel order #402-991823 before it ships.",
     "annotator_id": "human_annotator_1",
@@ -199,7 +199,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_012",
+    "item_id": "calib_012",
     "conversation_id": "conv_121099",
     "customer_message": "@AmazonHelp Received wrong size shoes in my order today!",
     "annotator_id": "human_annotator_1",
@@ -217,7 +217,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_013",
+    "item_id": "calib_013",
     "conversation_id": "conv_131110",
     "customer_message": "@AmazonHelp I need to speak to a real human manager right now, your bot is useless!",
     "annotator_id": "human_annotator_1",
@@ -235,7 +235,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_014",
+    "item_id": "calib_014",
     "conversation_id": "conv_141121",
     "customer_message": "@AmazonHelp Where can I check international shipping options?",
     "annotator_id": "human_annotator_1",
@@ -253,7 +253,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_015",
+    "item_id": "calib_015",
     "conversation_id": "conv_151132",
     "customer_message": "@AmazonHelp My account was hacked! Someone placed unauthorized orders!",
     "annotator_id": "human_annotator_1",
@@ -271,7 +271,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_016",
+    "item_id": "calib_016",
     "conversation_id": "conv_161143",
     "customer_message": "@AmazonHelp What is the return window for electronics?",
     "annotator_id": "human_annotator_1",
@@ -289,7 +289,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_017",
+    "item_id": "calib_017",
     "conversation_id": "conv_171154",
     "customer_message": "@AmazonHelp Returned my item 2 weeks ago and still haven't received refund!",
     "annotator_id": "human_annotator_1",
@@ -307,7 +307,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_018",
+    "item_id": "calib_018",
     "conversation_id": "conv_181165",
     "customer_message": "@AmazonHelp Package was left in the rain and ruined!",
     "annotator_id": "human_annotator_1",
@@ -325,7 +325,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_019",
+    "item_id": "calib_019",
     "conversation_id": "conv_191176",
     "customer_message": "@AmazonHelp Can I get a tax invoice for my order?",
     "annotator_id": "human_annotator_1",
@@ -343,7 +343,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_020",
+    "item_id": "calib_020",
     "conversation_id": "conv_201187",
     "customer_message": "@AmazonHelp Order status says delivered but nothing at my door!",
     "annotator_id": "human_annotator_1",
@@ -361,7 +361,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_021",
+    "item_id": "calib_021",
     "conversation_id": "conv_211198",
     "customer_message": "@AmazonHelp Driver was rude and refused to bring box to 2nd floor.",
     "annotator_id": "human_annotator_1",
@@ -379,7 +379,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_022",
+    "item_id": "calib_022",
     "conversation_id": "conv_221209",
     "customer_message": "@AmazonHelp How to cancel Prime membership trial?",
     "annotator_id": "human_annotator_1",
@@ -397,7 +397,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_023",
+    "item_id": "calib_023",
     "conversation_id": "conv_231220",
     "customer_message": "@AmazonHelp Tracking number is invalid on carrier website.",
     "annotator_id": "human_annotator_1",
@@ -415,7 +415,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_024",
+    "item_id": "calib_024",
     "conversation_id": "conv_241231",
     "customer_message": "@AmazonHelp Item arrived with missing power cable!",
     "annotator_id": "human_annotator_1",
@@ -433,7 +433,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_025",
+    "item_id": "calib_025",
     "conversation_id": "conv_251242",
     "customer_message": "@AmazonHelp I will report your company to consumer protection bureau if my refund isn't issued today!",
     "annotator_id": "human_annotator_1",
@@ -451,7 +451,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_026",
+    "item_id": "calib_026",
     "conversation_id": "conv_261253",
     "customer_message": "@AmazonHelp Can I change delivery address for an order in transit?",
     "annotator_id": "human_annotator_1",
@@ -469,7 +469,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_027",
+    "item_id": "calib_027",
     "conversation_id": "conv_271264",
     "customer_message": "@AmazonHelp Charged $14.99 twice on my card!",
     "annotator_id": "human_annotator_1",
@@ -487,7 +487,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_028",
+    "item_id": "calib_028",
     "conversation_id": "conv_281275",
     "customer_message": "@AmazonHelp How to apply gift card balance to open order?",
     "annotator_id": "human_annotator_1",
@@ -505,7 +505,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_029",
+    "item_id": "calib_029",
     "conversation_id": "conv_291286",
     "customer_message": "@AmazonHelp Package stolen from porch! Police report filed #99182.",
     "annotator_id": "human_annotator_1",
@@ -523,7 +523,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_030",
+    "item_id": "calib_030",
     "conversation_id": "conv_301297",
     "customer_message": "@AmazonHelp Need copy of purchase receipt for warranty claim.",
     "annotator_id": "human_annotator_1",
@@ -541,7 +541,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_031",
+    "item_id": "calib_031",
     "conversation_id": "conv_311308",
     "customer_message": "@AmazonHelp Is Prime Student discount available in Canada?",
     "annotator_id": "human_annotator_1",
@@ -559,7 +559,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_032",
+    "item_id": "calib_032",
     "conversation_id": "conv_321319",
     "customer_message": "@AmazonHelp Cancel order #119-283712 right now!",
     "annotator_id": "human_annotator_1",
@@ -577,7 +577,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_033",
+    "item_id": "calib_033",
     "conversation_id": "conv_331330",
     "customer_message": "@AmazonHelp Received box containing books instead of the laptop I ordered!",
     "annotator_id": "human_annotator_1",
@@ -595,7 +595,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_034",
+    "item_id": "calib_034",
     "conversation_id": "conv_341341",
     "customer_message": "@AmazonHelp Delivery delayed 4th time this month! Terrible service!",
     "annotator_id": "human_annotator_1",
@@ -613,7 +613,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_035",
+    "item_id": "calib_035",
     "conversation_id": "conv_351352",
     "customer_message": "@AmazonHelp Want refund for digital movie rental unwatched.",
     "annotator_id": "human_annotator_1",
@@ -631,7 +631,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_036",
+    "item_id": "calib_036",
     "conversation_id": "conv_361363",
     "customer_message": "@AmazonHelp Customer service representative hung up on me!",
     "annotator_id": "human_annotator_1",
@@ -649,7 +649,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_037",
+    "item_id": "calib_037",
     "conversation_id": "conv_371374",
     "customer_message": "@AmazonHelp Where is my package? Est date was yesterday.",
     "annotator_id": "human_annotator_1",
@@ -667,7 +667,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_038",
+    "item_id": "calib_038",
     "conversation_id": "conv_381385",
     "customer_message": "@AmazonHelp How to change credit card for Prime auto-renewal?",
     "annotator_id": "human_annotator_1",
@@ -685,7 +685,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_039",
+    "item_id": "calib_039",
     "conversation_id": "conv_391396",
     "customer_message": "@AmazonHelp Package arrived open and contents stolen!",
     "annotator_id": "human_annotator_1",
@@ -703,7 +703,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_040",
+    "item_id": "calib_040",
     "conversation_id": "conv_401407",
     "customer_message": "@AmazonHelp Do you offer price match if item goes on sale next day?",
     "annotator_id": "human_annotator_1",
@@ -721,7 +721,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_041",
+    "item_id": "calib_041",
     "conversation_id": "conv_411418",
     "customer_message": "@AmazonHelp I sent order details 3 times already! Stop asking again!",
     "annotator_id": "human_annotator_1",
@@ -739,7 +739,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_042",
+    "item_id": "calib_042",
     "conversation_id": "conv_421429",
     "customer_message": "@AmazonHelp How to track package without order number?",
     "annotator_id": "human_annotator_1",
@@ -757,7 +757,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_043",
+    "item_id": "calib_043",
     "conversation_id": "conv_431440",
     "customer_message": "@AmazonHelp Item marked delivered to wrong address in another state!",
     "annotator_id": "human_annotator_1",
@@ -775,7 +775,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_044",
+    "item_id": "calib_044",
     "conversation_id": "conv_441451",
     "customer_message": "@AmazonHelp Cancel my order #881-229381 immediately.",
     "annotator_id": "human_annotator_1",
@@ -793,7 +793,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_045",
+    "item_id": "calib_045",
     "conversation_id": "conv_451462",
     "customer_message": "@AmazonHelp How long does return refund take after dropping off at UPS?",
     "annotator_id": "human_annotator_1",
@@ -811,7 +811,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_046",
+    "item_id": "calib_046",
     "conversation_id": "conv_461473",
     "customer_message": "@AmazonHelp Received damaged glass jar shattered into pieces.",
     "annotator_id": "human_annotator_1",
@@ -829,7 +829,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_047",
+    "item_id": "calib_047",
     "conversation_id": "conv_471484",
     "customer_message": "@AmazonHelp My lawyer will be contacting your legal department regarding this breach!",
     "annotator_id": "human_annotator_1",
@@ -847,7 +847,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_048",
+    "item_id": "calib_048",
     "conversation_id": "conv_481495",
     "customer_message": "@AmazonHelp Where can I update my communication preferences?",
     "annotator_id": "human_annotator_1",
@@ -865,7 +865,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_049",
+    "item_id": "calib_049",
     "conversation_id": "conv_491506",
     "customer_message": "@AmazonHelp My Prime video subscription was cancelled unexpectedly!",
     "annotator_id": "human_annotator_1",
@@ -883,7 +883,7 @@
   },
   {
     "_provenance_note": "annotator_id and secondary_reviewer are placeholder identifiers; this file is a synthetic calibration scaffold, not independently verified human annotations",
-    "item_id": "gold_050",
+    "item_id": "calib_050",
     "conversation_id": "conv_501517",
     "customer_message": "@AmazonHelp Order tracking status hasn't moved in 5 days.",
     "annotator_id": "human_annotator_1",

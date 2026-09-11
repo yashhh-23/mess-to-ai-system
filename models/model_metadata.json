@@ -1,10 +1,10 @@
 {
-  "run_id": "2026-09-11T020356Z",
-  "run_dir": "results\\runs\\2026-09-11T020356Z",
-  "train_timestamp": "2026-09-11T02:03:56Z",
+  "run_id": "2026-09-11T122124Z",
+  "run_dir": "results\\runs\\2026-09-11T122124Z",
+  "train_timestamp": "2026-09-11T12:21:24Z",
   "download_required_for_full_repro": false,
-  "git_commit_sha": "76852f1e1a2f8bbe245444bad76b961cc9a1a318",
-  "source_code_hash": "21e7cc1dd2642a998dfca9de84038a114d11c535e679bb65da25f9d751672886",
+  "git_commit_sha": "ee81bb84daaa4b575842c9605bb897e7f2ab5c56",
+  "source_code_hash": "37b4aa4d6c9ceeb8dcc6aa4946470a820750d174bba7d184e9339a7b12bf3e23",
   "python_version": "3.13.7",
   "library_versions": {
     "scikit-learn": "1.9.0",
@@ -21,14 +21,14 @@
     "vector_index_count": 19800
   },
   "train_class_distribution": {
-    "damaged_wrong_item": 173,
-    "general_inquiry": 13570,
-    "complaint_about_service": 875,
-    "order_status": 1445,
-    "cancellation": 285,
+    "delivery_delay": 1032,
     "refund_request": 958,
-    "account_access": 1462,
-    "delivery_delay": 1032
+    "complaint_about_service": 875,
+    "general_inquiry": 13570,
+    "damaged_wrong_item": 173,
+    "cancellation": 285,
+    "order_status": 1445,
+    "account_access": 1462
   },
   "data_leakage_guard": {
     "golden_conversation_ids_count": 200,
@@ -39852,12 +39852,12 @@
   },
   "config_hash": "932a3e59cc94657fe13aa6dbe22ab78e",
   "raw_data_checksum": "73e961b2837626de89618a3f35f7bd6c",
-  "dataset_manifest_checksum": "61aa74a595acae548b0176019e89bd79",
+  "dataset_manifest_checksum": "a69e820b6d6e37be9b590d50096fed4c",
   "processed_data_checksum": "34dddd80a9e7519b61c05b8dcb5082cb",
-  "golden_set_checksum": "90bf75182fedfbe902cbdacc70d1e095",
-  "human_calibration_checksum": "3205a038325ca3f7a60c0d7399e694d7",
+  "golden_set_checksum": "426e2e9d2b2b7a295b65b3f8441f6e39",
+  "human_calibration_checksum": "73bc92d3d18e2906cc8681bc4f6d535f",
   "brand_metadata_checksum": "87bd43702f9bad1996ded123cb964928",
-  "intent_model_checksum": "8fcf88a2ab9a72c33ca34566971c265c",
-  "vector_store_checksum": "8455ecad1dd928a92cc13adfc453a5ec",
+  "intent_model_checksum": "ed2b1a2d2771b0fe301e93d470edd083",
+  "vector_store_checksum": "d8926b6b4ad25ce72f81308adb6710d5",
   "pipeline_status": "FRESH_REPRODUCED"
 }

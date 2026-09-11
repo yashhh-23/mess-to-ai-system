@@ -173,7 +173,7 @@ def compute_bootstrap_confidence_intervals(
             p = tp / (tp + fp) if (tp + fp) > 0 else 0.0
             r = tp / (tp + fn) if (tp + fn) > 0 else 0.0
             f1 = (2 * p * r / (p + r)) if (p + r) > 0 else 0.0
-            cov = (fp + tn) / n
+            cov = (tn + fn) / n
 
             # Response quality metrics
             b_j = item_judge_np[idxs]

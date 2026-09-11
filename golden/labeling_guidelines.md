@@ -8,10 +8,10 @@ Each item in the golden set contains:
 2. `conversation_id`: Raw thread identifier (used for strict data leakage partitioning).
 3. `customer_message`: Normalized current customer message.
 4. `context_messages`: Chronological array of prior conversation turns formatted as `Customer: ...` or `Brand: ...`.
-5. `gold_intent`: Hand-validated ground truth intent category.
-6. `gold_escalate`: Ground truth binary escalation decision (`true` or `false`).
+5. `gold_intent`: Rule-assisted reference intent category.
+6. `gold_escalate`: Rule-assisted reference escalation decision (`true` or `false`).
 7. `gold_reply`: Reference high-quality brand reply written in `@AmazonHelp` voice.
-8. `escalation_reason`: Human annotation explaining why escalation was chosen (or `null` if auto-handled).
+8. `escalation_reason`: Rule-assisted reference reason explaining why escalation was chosen (or `null` if auto-handled).
 
 ---
 
