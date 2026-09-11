@@ -1,7 +1,42 @@
 import re
-import yaml
-from typing import List, Dict, Any, Optional, Tuple, Literal
+from typing import Dict, List, Tuple, Optional, Any, Literal
 from src.llm_utils import LLMClient
+
+def redact_sensitive_pii(text: str) -> str:
+    """
+    Deterministic PII & Case-Specific Data Redaction Pass.
+    Redacts order IDs, tracking numbers, emails, phone numbers, credit cards, OTPs,
+    and agent initials from retrieved payloads and generated reply text.
+    """
+    if not isinstance(text, str) or not text:
+        return ""
+
+    s = text
+
+    # 1. Redact Amazon order numbers e.g. 402-1234567-8901234 or 112-3948571
+    s = re.sub(r'\b\d{3}-\d{7}-\d{7}\b', '<ORDER_ID>', s)
+    s = re.sub(r'\b\d{3}-\d{7}\b', '<ORDER_ID>', s)
+
+    # 2. Redact email addresses
+    s = re.sub(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b', '<EMAIL>', s)
+
+    # 3. Redact phone numbers (e.g. +1-800-555-0199 or 800-555-0199 or 10-digit numbers)
+    s = re.sub(r'\b(?:\+\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b', '<PHONE>', s)
+
+    # 4. Redact credit card / account long numeric sequences (13 to 19 digits)
+    s = re.sub(r'\b\d{13,19}\b', '<CARD_OR_ACCOUNT_NO>', s)
+
+    # 5. Redact tracking / reference numbers (8 to 12 digits)
+    s = re.sub(r'\b(tracking\s*(?:#|no|number)?:?\s*)\d{8,12}\b', r'\1<TRACKING_ID>', s, flags=re.IGNORECASE)
+
+    # 6. Redact Twitter agent sign-off initials e.g. ^SG, ^MA, ^BV, (2/2)^AP
+    s = re.sub(r'\s*(?:\(\d/\d\))?\s*\^[A-Za-z0-9]{1,3}\b', '', s)
+
+    # 7. Redact handles and URLs
+    s = re.sub(r'@[A-Za-z0-9_]+', '<USER>', s)
+    s = re.sub(r'https?://\S+', '<URL>', s)
+
+    return s
 
 class PostGenerationValidator:
     """
@@ -20,41 +55,40 @@ class PostGenerationValidator:
 
         sanitized_text = text or ""
 
-        # 1. Sanitize Unconditional Promises
+        # 0. Deterministic PII & Case-Specific Data Redaction Pass
+        sanitized_text = redact_sensitive_pii(sanitized_text)
+
+        # 1. Sanitize Unconditional Promises & Unvalidated Historical Guarantees
         promise_patterns = [
-            # Original three patterns
             (r'we will refund (you|your money) (automatically|immediately)',
              'you can request a refund review via <URL>'),
             (r'free return label guaranteed',
              'you can request a return label via <URL>'),
             (r'100% money back guaranteed',
              'you can submit a claim via <URL>'),
-
-            # Definite refund / money-back claims
             (r'you will receive a refund\b',
              'you may be eligible for a refund — please check via <URL>'),
             (r'your refund (is|has been|was) (approved|processed|issued|confirmed)',
              'your refund request can be reviewed via <URL>'),
             (r'(a |your )?refund has been (issued|sent|processed)',
              'a refund request can be submitted via <URL>'),
-
-            # Definite delivery / arrival promises
             (r'your (package|order|item) will (arrive|be delivered)\b',
              'you can check your delivery status via <URL>'),
             (r'will (arrive|be delivered) (by|on|tomorrow|today)\b',
              'you can track your delivery via <URL>'),
-
-            # Unconditional fix / resolution guarantees
             (r"we('ll| will) (fix|resolve|sort) this (immediately|right away|now|today)\b",
              'please DM us your order details and we\'ll look into this via <URL>'),
             (r'this (will|shall) be (resolved|fixed|sorted)\b',
              'please DM us and we\'ll investigate via <URL>'),
-
-            # Free / automatic item / label guarantees
             (r'(a |your )?free (replacement|label) (has been|was) (issued|sent|approved)',
              'you can request a replacement or return label via <URL>'),
             (r'we guarantee a (replacement|refund|return)',
              'you can request a <URL> to check eligibility'),
+            # Additional historical tweet guarantees
+            (r'we\s+(assure|promise|guarantee)\s+you\b', 'we are working to assist you'),
+            (r'at the earliest\b', 'as soon as possible'),
+            (r'definitely\s+(resolve|fix|refund)\b', 'investigate and assist'),
+            (r'we(\'ll| will)\s+(contact|reach out to)\s+you\b', 'you can reach us via <URL>'),
         ]
         for pattern, replacement in promise_patterns:
             if re.search(pattern, sanitized_text, re.IGNORECASE):
@@ -85,22 +119,20 @@ class PostGenerationValidator:
             sanitized_text = f"{sanitized_text.rstrip()}{punct} Please visit <URL> for the next step."
 
         # 4. Channel-Aware Clause-Level Sensitive Data Policy & Safety Check
-        safe_advisory_pattern = r"(do not|don't|never|avoid|not)\s+(share|post|tweet|send|provide|give)\b|for your security|keep your \w+ safe"
+        safe_advisory_pattern = r"(do not|don't|never|avoid|not)\s+(share|post|tweet|send|provide|give|message)\b|for your security|keep your \w+ safe"
         
         # Highly sensitive credentials prohibited across ALL channels (public, dm, secure_form)
         strict_prohibited_credentials = [
-            'password', 'passcode', 'credit card', 'debit card', 'card number', 'ssn', 'social security',
-            'cvv', 'cvc', 'bank details', 'bank account', 'routing number', 'security code', 'otp',
-            'verification code', 'pin number', 'government id', 'passport'
+            'password', 'passcode', 'credit card', 'debit card', 'card number', 'card info',
+            'ssn', 'social security', 'cvv', 'cvc', 'bank details', 'bank account', 'account number',
+            'account details', 'login credentials', 'routing number', 'security code', 'otp',
+            'verification code', 'pin number', 'security pin', 'government id', 'passport'
         ]
         
         # Public-only PII solicitation patterns (prohibited on public Twitter, allowed in DM/secure_form)
         public_pii_solicit_patterns = [
-            r"send (us )?your (email|phone|address|password|pin|card)",
-            r"tweet (us )?your (email|phone|address|password|pin|card)",
-            r"reply with your (email|phone|address|password|pin|card)",
-            r"provide your (email|phone|address|password|pin|card)",
-            r"share your (email|phone|address|contact details)"
+            r"(send|tweet|reply|provide|share|message)\s+(us\s+)?(your\s+)?(email|phone|address|password|pin|card|account number|account details|login credentials)",
+            r"share\s+your\s+(email|phone|address|contact details|account details)"
         ]
 
         clauses = re.split(r'[\.\!\?;\n—–|-]+', sanitized_text)
@@ -167,7 +199,10 @@ class RAGReplyGenerator:
             cid = pair.get('conversation_id', f'hist_{i}')
             score = round(float(pair.get('score', 0.0)), 4)
             citations.append({'conversation_id': cid, 'similarity_score': score})
-            retrieved_context_str += f"\nEvidence {i} [ID: {cid}, Sim: {score}]:\nCustomer: {pair.get('customer_message','')}\nHistorical Resolution: {pair.get('brand_reply','')}\n"
+            
+            clean_cust = redact_sensitive_pii(pair.get('customer_message',''))
+            clean_brand = redact_sensitive_pii(pair.get('brand_reply',''))
+            retrieved_context_str += f"\nEvidence {i} [ID: {cid}, Sim: {score}]:\nCustomer: {clean_cust}\nHistorical Resolution: {clean_brand}\n"
 
         system_prompt = (
             f"You are the official Twitter customer support agent for {self.brand_handle}.\n"
@@ -202,9 +237,8 @@ class RAGReplyGenerator:
             if best_match and best_score >= 0.35:
                 generation_mode = "Evidence-Adapted-Fallback"
                 hist_text = best_match['brand_reply']
-                # Scrub specific names/handles to treat as evidence template
-                adapted = re.sub(r'@[A-Za-z0-9_]+', '<USER>', hist_text)
-                adapted = re.sub(r'https?://\S+', '<URL>', adapted)
+                # Redact specific PII, handles, order numbers, and initials
+                adapted = redact_sensitive_pii(hist_text)
                 raw_draft = adapted
             else:
                 generation_mode = "Template-Fallback"

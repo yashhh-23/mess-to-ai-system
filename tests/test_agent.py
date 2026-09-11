@@ -273,6 +273,52 @@ def test_promise_sanitization():
         assert "<URL>" in cleaned
 
 
+def test_pii_redaction_and_privacy_safety():
+    """Verifies deterministic PII redaction, evidence fallback scrubbing, and output PII protection."""
+    from src.reply_generator import redact_sensitive_pii
+
+    # 1. PII Redaction unit tests
+    raw_text = "Order 402-1234567-8901234, email john@example.com, phone 1-800-555-0199, card 4111222233334444 ^SG (1/2)^MA"
+    redacted = redact_sensitive_pii(raw_text)
+    assert "402-1234567-8901234" not in redacted
+    assert "<ORDER_ID>" in redacted
+    assert "john@example.com" not in redacted
+    assert "<EMAIL>" in redacted
+    assert "1-800-555-0199" not in redacted
+    assert "<PHONE>" in redacted
+    assert "4111222233334444" not in redacted
+    assert "<CARD_OR_ACCOUNT_NO>" in redacted
+    assert "^SG" not in redacted
+    assert "^MA" not in redacted
+
+    # 2. Output scrubbing in PostGenerationValidator
+    validator = PostGenerationValidator()
+    raw_out = "Hi <USER>, your order 112-3948571 has shipped. Contact us at help@amazon.com ^BV"
+    cleaned, _ = validator.sanitize_and_validate(raw_out)
+    assert "112-3948571" not in cleaned
+    assert "help@amazon.com" not in cleaned
+    assert "^BV" not in cleaned
+    assert "<ORDER_ID>" in cleaned
+    assert "<EMAIL>" in cleaned
+
+    # 3. Evidence-Adapted Fallback Pass
+    generator = RAGReplyGenerator()
+    generator.llm_client.api_key = None  # force fallback mode
+    hist_pair = [{
+        'conversation_id': 'hist_999',
+        'score': 0.85,
+        'customer_message': 'Where is my order?',
+        'brand_reply': 'Hi @customer_12, order 402-9999999-1111111 is on the way. Email support@amazon.com for help ^AP'
+    }]
+    res = generator.generate_reply_detailed("Where is my order?", "order_status", hist_pair)
+    reply = res['reply']
+    assert "402-9999999-1111111" not in reply
+    assert "support@amazon.com" not in reply
+    assert "^AP" not in reply
+    assert "<ORDER_ID>" in reply or "<EMAIL>" in reply or "<URL>" in reply
+
+
+
 def test_character_length_truncation_280():
     """Verifies PostGenerationValidator strictly enforces <= 280 character limit."""
     validator = PostGenerationValidator()
