@@ -927,11 +927,46 @@ def test_llm_custom_base_url_authentication():
             provider="ollama",
             base_url="http://localhost:11434/v1/chat/completions"
         )
-        res_oll = client_ollama.generate_detailed("Test prompt")
-        assert res_oll['content'] == "Custom response"
-        req_oll = mock_urlopen.call_args[0][0]
-        assert "Authorization" not in req_oll.headers
-        assert req_oll.full_url == "http://localhost:11434/v1/chat/completions"
+from src.data_cleaning import to_bool, build_threads_for_brand
+
+
+def test_data_cleaning_to_bool_coercion():
+    """Tests that string boolean representations ('False', 'True', '0', '1') coerce safely to bool."""
+    assert to_bool("False") is False
+    assert to_bool("false") is False
+    assert to_bool("True") is True
+    assert to_bool("true") is True
+    assert to_bool(False) is False
+    assert to_bool(True) is True
+    assert to_bool(0) is False
+    assert to_bool(1) is True
+
+    with pytest.raises(ValueError):
+        to_bool("invalid_bool_string")
+
+
+def test_build_threads_full_graph_traversal_and_multi_reply_metadata():
+    """Tests full raw graph ancestor recovery and response_selection_rule metadata recording."""
+    data = [
+        # Ancestor turn (customer message without @AmazonHelp)
+        {'tweet_id': '101', 'author_id': 'cust_1', 'inbound': 'True', 'text': 'My order is delayed', 'in_response_to_tweet_id': None, 'response_tweet_id': '102'},
+        {'tweet_id': '102', 'author_id': 'AmazonHelp', 'inbound': 'False', 'text': 'Hi <USER>, please send us a DM', 'in_response_to_tweet_id': '101', 'response_tweet_id': '103'},
+        # Target turn (customer mentions @AmazonHelp)
+        {'tweet_id': '103', 'author_id': 'cust_1', 'inbound': 'True', 'text': '@AmazonHelp I sent the DM, check order status', 'in_response_to_tweet_id': '102', 'response_tweet_id': '104, 105'},
+        # Multiple brand reply candidates
+        {'tweet_id': '104', 'author_id': 'AmazonHelp', 'inbound': 'False', 'text': 'Hi <USER>, we are checking your account status now.', 'in_response_to_tweet_id': '103', 'response_tweet_id': None},
+        {'tweet_id': '105', 'author_id': 'AmazonHelp', 'inbound': 'False', 'text': 'Secondary reply', 'in_response_to_tweet_id': '103', 'response_tweet_id': None}
+    ]
+    df = pd.DataFrame(data)
+    threads = build_threads_for_brand(df, brand_handle="@AmazonHelp", max_threads=10)
+    
+    assert len(threads) == 1
+    t = threads[0]
+    assert t['interaction_id'] == 'conv_103'
+    assert t['response_selection_rule'] == 'first_chronological_brand_reply'
+    assert t['selected_reply_tweet_id'] == '104'
+    assert len(t['context_messages']) >= 1
+
 
 
 

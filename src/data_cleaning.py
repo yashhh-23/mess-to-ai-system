@@ -27,22 +27,32 @@ def normalize_text(text: str, brand_handle: str = "@AmazonHelp") -> str:
             
     return " ".join(normalized_words)
 
+def to_bool(value) -> bool:
+    """Safely coerces schema boolean values (bool, 'True', 'False', 1, 0) to bool."""
+    if isinstance(value, bool):
+        return value
+    val_str = str(value).strip().lower()
+    if val_str in {"true", "1"}:
+        return True
+    elif val_str in {"false", "0"}:
+        return False
+    raise ValueError(f"[Data Cleaning Error] Invalid boolean value for inbound: {value!r}")
+
 def build_threads_for_brand(df: pd.DataFrame, brand_handle: str = "@AmazonHelp", max_threads: int = 25000, max_history_turns: int = 3) -> List[Dict[str, Any]]:
     """
     Extracts multi-turn conversation threads where customer mentions brand and brand replies.
+    
+    Traverses complete raw conversation graph (indexing all raw tweets before brand filtering)
+    so ancestor customer turns that do not explicitly contain brand mentions are recovered.
+    `conversation_id` / `interaction_id` represents the unique turn-level interaction pair (`conv_{inbound_tweet_id}`).
     """
     print(f"[Data Cleaning] Filtering dataset for brand {brand_handle}...")
     reply_col = 'in_response_to_tweet_id' if 'in_response_to_tweet_id' in df.columns else 'in_reply_to_tweet_id'
     brand_name = brand_handle.replace("@", "")
     
-    is_brand_author = df['author_id'].astype(str).str.lower() == brand_name.lower()
-    mentions_brand = df['text'].astype(str).str.lower().str.contains(brand_handle.lower())
-    
-    brand_df = df[is_brand_author | mentions_brand].copy()
-    print(f"[Data Cleaning] Total tweets referencing {brand_handle}: {len(brand_df)}")
-    
+    # 1. Index ALL raw tweets to preserve full conversation graph ancestors
     tweet_dict = {}
-    for idx, row in brand_df.iterrows():
+    for idx, row in df.iterrows():
         t_id = str(row['tweet_id'])
         in_resp = str(row[reply_col]) if pd.notna(row[reply_col]) else None
         resp_tweet = str(row['response_tweet_id']) if pd.notna(row['response_tweet_id']) else None
@@ -50,29 +60,40 @@ def build_threads_for_brand(df: pd.DataFrame, brand_handle: str = "@AmazonHelp",
         tweet_dict[t_id] = {
             'tweet_id': t_id,
             'author_id': str(row['author_id']),
-            'inbound': bool(row['inbound']),
+            'inbound': to_bool(row['inbound']),
             'created_at': str(row.get('created_at', '')),
             'text': str(row['text']),
             'in_response_to_tweet_id': in_resp,
             'response_tweet_id': resp_tweet
         }
         
+    print(f"[Data Cleaning] Indexed {len(tweet_dict)} total raw tweets for graph traversal.")
+    
     threads = []
     seen_conversations = set()
     
     for tweet_id, tweet in tweet_dict.items():
-        if tweet['inbound'] and tweet['response_tweet_id']:
+        # Identify brand interaction endpoints: customer inbound mentioning brand with a brand reply
+        mentions_brand = brand_handle.lower() in tweet['text'].lower()
+        if tweet['inbound'] and mentions_brand and tweet['response_tweet_id']:
             response_ids = [r.strip() for r in str(tweet['response_tweet_id']).split(',') if r.strip()]
             
+            selected_resp_id = None
             brand_reply_text = None
+            
+            # Selection rule: First matching chronological brand reply
             for resp_id in response_ids:
                 if resp_id in tweet_dict and not tweet_dict[resp_id]['inbound']:
-                    brand_reply_text = tweet_dict[resp_id]['text']
-                    break
+                    resp_author = tweet_dict[resp_id]['author_id'].lower()
+                    if resp_author == brand_name.lower():
+                        selected_resp_id = resp_id
+                        brand_reply_text = tweet_dict[resp_id]['text']
+                        break
                     
             if not brand_reply_text:
                 continue
                 
+            # Traverse ancestor turns in FULL graph (depth <= max_history_turns)
             context_turns = []
             curr_reply_to = tweet['in_response_to_tweet_id']
             depth = 0
@@ -99,7 +120,10 @@ def build_threads_for_brand(df: pd.DataFrame, brand_handle: str = "@AmazonHelp",
             threads.append({
                 'id': conv_id,
                 'conversation_id': conv_id,
-                'tweet_id': tweet['tweet_id'],
+                'interaction_id': conv_id,
+                'turn_inbound_tweet_id': tweet['tweet_id'],
+                'selected_reply_tweet_id': selected_resp_id,
+                'response_selection_rule': 'first_chronological_brand_reply',
                 'customer_message': customer_text_norm,
                 'context_messages': context_turns,
                 'brand_reply': brand_reply_norm,
