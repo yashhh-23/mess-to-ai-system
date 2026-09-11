@@ -501,7 +501,15 @@ def run_evaluation(config_path: str = "configs/config.yaml", run_id: Optional[st
         'intent_counts': intent_counts,
         'escalation_count': escalate_count,
         'auto_handle_count': len(golden_items) - escalate_count,
-        'escalation_ratio': round(escalate_count / len(golden_items), 4)
+        'escalation_ratio': round(escalate_count / len(golden_items), 4),
+        'labeling_mechanism': 'rule_assisted_reference_labeling',
+        'is_human_annotated': False,
+        'labeling_mechanism_disclosure': (
+            "Golden set evaluation labels were generated using rule-assisted reference labeling (reference_pipeline_v1). "
+            "Because training weak labels, evaluation reference labels, escalation logic, and baseline rules share keyword patterns, "
+            "headline metrics reflect agreement with rule-derived proxies. Exact conversation ID separation prevents direct data leakage, "
+            "but rule-mechanism correlation remains an inherent limitation of rule-assisted reference sets."
+        )
     }
 
     human_calib_dict = {}

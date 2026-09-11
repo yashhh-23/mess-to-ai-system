@@ -1,6 +1,6 @@
 {
-  "run_id": "2026-09-11T142337Z_de50caa0",
-  "run_directory": "results\\runs\\2026-09-11T142337Z_de50caa0",
+  "run_id": "2026-09-11T144019Z_c57674bf",
+  "run_directory": "results\\runs\\2026-09-11T144019Z_c57674bf",
   "resolved_brand_handle": "@AmazonHelp",
   "near_duplicate_diagnostics": {
     "max_near_duplicate_similarity": 0.6829,
@@ -38,7 +38,10 @@
     },
     "escalation_count": 40,
     "auto_handle_count": 160,
-    "escalation_ratio": 0.2
+    "escalation_ratio": 0.2,
+    "labeling_mechanism": "rule_assisted_reference_labeling",
+    "is_human_annotated": false,
+    "labeling_mechanism_disclosure": "Golden set evaluation labels were generated using rule-assisted reference labeling (reference_pipeline_v1). Because training weak labels, evaluation reference labels, escalation logic, and baseline rules share keyword patterns, headline metrics reflect agreement with rule-derived proxies. Exact conversation ID separation prevents direct data leakage, but rule-mechanism correlation remains an inherent limitation of rule-assisted reference sets."
   },
   "classifier_confidence_calibration": {
     "mean_confidence": 0.819,

@@ -114,14 +114,22 @@ class HybridIntentClassifier:
         print(f"[Intent Classifier] Training classifier with Data Leakage Guard...")
         
         golden_ids = set()
+        golden_msgs = []
         if os.path.exists(golden_path):
             with open(golden_path, 'r', encoding='utf-8') as f:
                 golden_items = [json.loads(line) for line in f]
                 golden_ids = {g['conversation_id'] for g in golden_items}
+                golden_msgs = [g['customer_message'] for g in golden_items]
         print(f"[Intent Classifier] Excluding {len(golden_ids)} Golden Set conversation IDs from training pool.")
 
         with open(processed_path, 'r', encoding='utf-8') as f:
             threads = [json.loads(line) for line in f]
+
+        # Enforce Near-Duplicate Split Constraint
+        excluded_near_dupe_count = 0
+        if golden_msgs:
+            dupe_vec = TfidfVectorizer(ngram_range=(1, 2)).fit(golden_msgs)
+            X_gold = dupe_vec.transform(golden_msgs)
 
         train_texts = []
         train_labels = []
@@ -131,6 +139,13 @@ class HybridIntentClassifier:
             if thread['conversation_id'] in golden_ids:
                 continue
             
+            if golden_msgs:
+                X_cand = dupe_vec.transform([thread['customer_message']])
+                max_sim = float(X_cand.dot(X_gold.T).toarray().max())
+                if max_sim >= 0.85:
+                    excluded_near_dupe_count += 1
+                    continue
+
             self.trained_conversation_ids.append(thread['conversation_id'])
             context_str = " ".join(thread.get('context_messages', []))
             full_input = f"{context_str} Customer: {thread['customer_message']}".strip()
@@ -139,6 +154,8 @@ class HybridIntentClassifier:
             train_texts.append(full_input)
             train_labels.append(label)
 
+        if excluded_near_dupe_count > 0:
+            print(f"[Data Leakage Guard] Enforced split constraint: excluded {excluded_near_dupe_count} near-duplicate threads (similarity >= 0.85) from classifier training.")
         print(f"[Intent Classifier] Training sample size: {len(train_texts)} items.")
         X_tfidf = self.vectorizer.fit_transform(train_texts)
         self.model.fit(X_tfidf, train_labels)

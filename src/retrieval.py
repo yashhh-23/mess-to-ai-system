@@ -22,16 +22,23 @@ class HistoricalSupportInteractionRetriever:
                     golden_path: str = "golden/golden_set.jsonl"):
         print("[Retriever] Building Historical TF-IDF Lexical Index with Data Leakage Guard...")
         
-        # Golden Set Exclusion Filter
+        # Golden Set Exclusion Filter & Near-Duplicate Split Constraint
         golden_ids = set()
+        golden_msgs = []
         if os.path.exists(golden_path):
             with open(golden_path, 'r', encoding='utf-8') as f:
                 golden_items = [json.loads(line) for line in f]
                 golden_ids = {g['conversation_id'] for g in golden_items}
+                golden_msgs = [g['customer_message'] for g in golden_items]
         print(f"[Retriever] Excluding {len(golden_ids)} Golden Set conversation IDs from RAG memory index.")
 
         with open(processed_path, 'r', encoding='utf-8') as f:
             threads = [json.loads(line) for line in f]
+
+        excluded_near_dupe_count = 0
+        if golden_msgs:
+            dupe_vec = TfidfVectorizer(ngram_range=(1, 2)).fit(golden_msgs)
+            X_gold = dupe_vec.transform(golden_msgs)
 
         self.items = []
         corpus_texts = []
@@ -40,20 +47,31 @@ class HistoricalSupportInteractionRetriever:
             if thread['conversation_id'] in golden_ids:
                 continue
             
+            if golden_msgs:
+                X_cand = dupe_vec.transform([thread['customer_message']])
+                max_sim = float(X_cand.dot(X_gold.T).toarray().max())
+                if max_sim >= 0.85:
+                    excluded_near_dupe_count += 1
+                    continue
+
             # Customer issue + thread context as document representation (brand reply attached as payload)
             context_str = " ".join(thread.get('context_messages', []))
             text_to_index = f"{context_str} {thread['customer_message']}".strip()
             corpus_texts.append(text_to_index)
             self.items.append(thread)
 
+        if excluded_near_dupe_count > 0:
+            print(f"[Data Leakage Guard] Enforced split constraint: excluded {excluded_near_dupe_count} near-duplicate threads (similarity >= 0.85) from RAG memory index.")
+
         print(f"[Retriever] Indexing {len(self.items)} observed historical support interaction pairs...")
         self.tfidf_matrix = self.vectorizer.fit_transform(corpus_texts)
         self.is_indexed = True
         print("[Retriever] TF-IDF lexical index construction complete.")
 
-    def retrieve(self, customer_message: str, context_messages: List[str] = None, top_k: int = 3) -> List[Dict[str, Any]]:
+    def retrieve(self, customer_message: str, context_messages: List[str] = None, top_k: int = 3, min_score: float = 0.0001) -> List[Dict[str, Any]]:
         """
         Retrieves Top-K most lexically similar observed historical support interaction pairs using TF-IDF and cosine similarity.
+        Filters out items with similarity score <= min_score to prevent zero-similarity arbitrary items from leaking into prompts.
         """
         if not self.is_indexed:
             return []
@@ -69,6 +87,8 @@ class HistoricalSupportInteractionRetriever:
         results = []
         for idx in top_indices:
             score = float(similarities[idx])
+            if score <= min_score:
+                continue
             item = self.items[idx]
             results.append({
                 'score': score,

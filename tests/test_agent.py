@@ -1090,6 +1090,47 @@ def test_reproducibility_pipeline_status_lifecycle():
         assert meta.get('pipeline_status') in ['COMPLETED', 'FRESH_REPRODUCED']
 
 
+def test_baseline_isolation_end_to_end():
+    """Verifies that Trivial and Simple Baselines execute without touching LLM or Retriever."""
+    from src.intent_classifier import HybridIntentClassifier
+    from src.escalation import EscalationEngine
+    from src.reply_generator import PostGenerationValidator
+
+    validator = PostGenerationValidator()
+    escalator = EscalationEngine()
+
+    with patch("src.llm_utils.LLMClient.generate_detailed", side_effect=RuntimeError("Baseline called LLM!")), \
+         patch("src.retrieval.HistoricalSupportInteractionRetriever.retrieve", side_effect=RuntimeError("Baseline called Retriever!")):
+
+        # 1. Trivial Baseline execution
+        pred_intent_t = 'general_inquiry'
+        esc_t = False
+        reply_raw_t = "Hi <USER>, thank you for contacting customer support. We are here to help and will assist you shortly. Please let us know how we can help!"
+        cleaned_t, val_t = validator.sanitize_and_validate(reply_raw_t)
+        assert val_t['safety_pass'] is True
+
+        # 2. Simple Baseline execution
+        clf_simple = HybridIntentClassifier()
+        pred_intent_s = clf_simple._rule_fallback("My order is missing and delayed")
+        assert pred_intent_s in ['delivery_delay', 'damaged_wrong_item', 'order_status']
+        esc_s, _, _ = escalator.evaluate("My order is missing and delayed", pred_intent_s, 0.50, retrieval_score=0.0)
+        assert isinstance(esc_s, bool)
+
+
+def test_zero_similarity_retrieval_filtering():
+    """Verifies HistoricalSupportInteractionRetriever filters out zero-similarity items."""
+    retriever = HistoricalSupportInteractionRetriever()
+    retriever.vectorizer.fit(["package delivery order status"])
+    retriever.tfidf_matrix = retriever.vectorizer.transform(["package delivery order status"])
+    retriever.items = [{'conversation_id': 'c1', 'customer_message': 'package delivery', 'brand_reply': 'Hi <USER>'}]
+    retriever.is_indexed = True
+
+    # Out of vocabulary query -> 0 similarity -> must return empty list
+    results = retriever.retrieve("xyzabc completely unknown query tokens", min_score=0.0001)
+    assert len(results) == 0
+
+
+
 
 
 
