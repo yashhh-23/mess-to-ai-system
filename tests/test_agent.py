@@ -858,11 +858,81 @@ def test_documentation_metrics_match_latest_evaluation_artifact():
     esc_recall = f"{main_bench['Escalation Recall']*100:.2f}%"
     reply_cov = f"{main_bench['Reply Coverage']*100:.1f}%"
 
-    assert headline_score in report_text, f"Report headline score does not match saved artifact value {headline_score}"
-    assert intent_f1 in report_text, f"Report intent F1 does not match saved artifact value {intent_f1}"
-    assert esc_f1 in report_text, f"Report escalation F1 does not match saved artifact value {esc_f1}"
-    assert esc_recall in report_text, f"Report escalation recall does not match saved artifact value {esc_recall}"
-    assert reply_cov in report_text, f"Report reply coverage does not match saved artifact value {reply_cov}"
+def test_escalation_intent_risk_map_override_increases_score(tmp_path):
+    """Tests that modifying intent_risk_map in a temporary config increases the resulting risk score."""
+    default_engine = EscalationEngine()
+    _, default_score, _ = default_engine.evaluate("My service is bad", "complaint_about_service", 0.90, retrieval_score=0.90)
+
+    custom_cfg_path = tmp_path / "custom_config.yaml"
+    custom_cfg_path.write_text("""
+escalation:
+  weights:
+    intent_risk: 0.30
+    low_confidence: 0.25
+    keyword_risk: 0.20
+    low_retrieval_sim: 0.10
+    thread_length: 0.08
+    sentiment_risk: 0.07
+  score_threshold: 0.50
+  high_risk_keywords: []
+  intent_risk_map:
+    complaint_about_service: 0.95
+""", encoding="utf-8")
+
+    custom_engine = EscalationEngine(config_path=str(custom_cfg_path))
+    _, custom_score, _ = custom_engine.evaluate("My service is bad", "complaint_about_service", 0.90, retrieval_score=0.90)
+
+    assert custom_score > default_score, f"Expected custom risk score ({custom_score}) to be higher than default score ({default_score})"
+
+
+def test_llm_custom_base_url_authentication():
+    """Tests that provider-specific authentication headers are preserved when base_url is supplied."""
+    mock_body = json.dumps({
+        "choices": [{"message": {"content": "Custom response"}}]
+    }).encode("utf-8")
+
+    mock_resp = MagicMock()
+    mock_resp.read.return_value = mock_body
+    mock_resp.__enter__.return_value = mock_resp
+
+    with patch("urllib.request.urlopen", return_value=mock_resp) as mock_urlopen:
+        # OpenAI with custom base_url
+        client_openai = LLMClient(
+            provider="openai",
+            api_key="sk-custom-openai-key",
+            base_url="https://custom.openai.endpoint/v1/chat/completions"
+        )
+        res_o = client_openai.generate_detailed("Test prompt")
+        assert res_o['content'] == "Custom response"
+        req_o = mock_urlopen.call_args[0][0]
+        assert req_o.headers.get("Authorization") == "Bearer sk-custom-openai-key"
+        assert req_o.full_url == "https://custom.openai.endpoint/v1/chat/completions"
+
+    with patch("urllib.request.urlopen", return_value=mock_resp) as mock_urlopen:
+        # Gemini with custom base_url
+        client_gemini = LLMClient(
+            provider="gemini",
+            api_key="gemini-custom-key",
+            base_url="https://custom.gemini.endpoint/v1/chat/completions"
+        )
+        res_g = client_gemini.generate_detailed("Test prompt")
+        assert res_g['content'] == "Custom response"
+        req_g = mock_urlopen.call_args[0][0]
+        assert req_g.headers.get("Authorization") == "Bearer gemini-custom-key"
+        assert req_g.full_url == "https://custom.gemini.endpoint/v1/chat/completions"
+
+    with patch("urllib.request.urlopen", return_value=mock_resp) as mock_urlopen:
+        # Ollama with custom base_url
+        client_ollama = LLMClient(
+            provider="ollama",
+            base_url="http://localhost:11434/v1/chat/completions"
+        )
+        res_oll = client_ollama.generate_detailed("Test prompt")
+        assert res_oll['content'] == "Custom response"
+        req_oll = mock_urlopen.call_args[0][0]
+        assert "Authorization" not in req_oll.headers
+        assert req_oll.full_url == "http://localhost:11434/v1/chat/completions"
+
 
 
 

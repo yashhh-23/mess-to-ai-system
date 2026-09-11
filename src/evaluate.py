@@ -321,10 +321,11 @@ def check_artifact_metadata(config_path: str = "configs/config.yaml", metadata_p
     except Exception as e:
         raise RuntimeError(f"[Artifact Validation Error] Could not parse '{metadata_path}': {e}") from e
 
-    # Recompute current checksums
     raw_csv_path = "data/raw/twcs.csv"
     processed_path = "data/processed/amazonhelp_threads.jsonl"
     golden_path = "golden/golden_set.jsonl"
+    human_calib_path = "golden/human_calibration.json"
+    brand_meta_path = "data/processed/brand_metadata.json"
     intent_model_path = "models/intent_classifier.pkl"
     vector_store_path = "models/vector_store.pkl"
     manifest_path = "data/raw/data_manifest.json"
@@ -337,6 +338,8 @@ def check_artifact_metadata(config_path: str = "configs/config.yaml", metadata_p
                 raw_csv_path = paths.get('raw_data', raw_csv_path)
                 processed_path = paths.get('processed_data', processed_path)
                 golden_path = paths.get('golden_set', golden_path)
+                human_calib_path = paths.get('human_calibration', human_calib_path)
+                brand_meta_path = paths.get('brand_metadata', brand_meta_path)
                 intent_model_path = paths.get('intent_model', intent_model_path)
                 vector_store_path = paths.get('vector_store', vector_store_path)
         except Exception:
@@ -347,6 +350,8 @@ def check_artifact_metadata(config_path: str = "configs/config.yaml", metadata_p
         'dataset_manifest_checksum': (manifest_path, meta.get('dataset_manifest_checksum')),
         'processed_data_checksum': (processed_path, meta.get('processed_data_checksum')),
         'golden_set_checksum': (golden_path, meta.get('golden_set_checksum')),
+        'human_calibration_checksum': (human_calib_path, meta.get('human_calibration_checksum')),
+        'brand_metadata_checksum': (brand_meta_path, meta.get('brand_metadata_checksum')),
         'intent_model_checksum': (intent_model_path, meta.get('intent_model_checksum')),
         'vector_store_checksum': (vector_store_path, meta.get('vector_store_checksum')),
     }
@@ -454,8 +459,8 @@ def run_evaluation(config_path: str = "configs/config.yaml", run_id: Optional[st
         config = yaml.safe_load(f)
         
     golden_path = config['paths']['golden_set']
-    human_calib_path = "golden/human_calibration.json"
-    brand_meta_path = "data/processed/brand_metadata.json"
+    human_calib_path = config.get('paths', {}).get('human_calibration', "golden/human_calibration.json")
+    brand_meta_path = config.get('paths', {}).get('brand_metadata', "data/processed/brand_metadata.json")
     
     llm_cfg = config.get('llm', {})
     provider = llm_cfg.get('provider', 'auto')

@@ -157,6 +157,8 @@ def execute_master_pipeline(config_path: str = "configs/config.yaml"):
         'dataset_manifest_checksum': manifest_checksum,
         'processed_data_checksum': compute_file_hash(processed_jsonl),
         'golden_set_checksum': compute_file_hash(config['paths']['golden_set']),
+        'human_calibration_checksum': compute_file_hash(config['paths'].get('human_calibration', 'golden/human_calibration.json')),
+        'brand_metadata_checksum': compute_file_hash(brand_meta_path),
         'intent_model_checksum': compute_file_hash(config['paths']['intent_model']),
         'vector_store_checksum': compute_file_hash(config['paths']['vector_store']),
         'pipeline_status': 'FRESH_REPRODUCED'

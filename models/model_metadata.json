@@ -39855,6 +39855,8 @@
   "dataset_manifest_checksum": "61aa74a595acae548b0176019e89bd79",
   "processed_data_checksum": "34dddd80a9e7519b61c05b8dcb5082cb",
   "golden_set_checksum": "90bf75182fedfbe902cbdacc70d1e095",
+  "human_calibration_checksum": "3205a038325ca3f7a60c0d7399e694d7",
+  "brand_metadata_checksum": "87bd43702f9bad1996ded123cb964928",
   "intent_model_checksum": "8fcf88a2ab9a72c33ca34566971c265c",
   "vector_store_checksum": "8455ecad1dd928a92cc13adfc453a5ec",
   "pipeline_status": "FRESH_REPRODUCED"

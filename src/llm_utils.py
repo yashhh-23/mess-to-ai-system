@@ -71,18 +71,18 @@ class LLMClient:
             }
 
         headers = {"Content-Type": "application/json"}
+        if self.api_key and self.provider in ["openai", "gemini"]:
+            headers["Authorization"] = f"Bearer {self.api_key}"
         
         # Endpoint selection
         if self.base_url:
             endpoint = self.base_url
         elif self.provider == "gemini":
             endpoint = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
-            headers["Authorization"] = f"Bearer {self.api_key}"
         elif self.provider == "ollama":
             endpoint = "http://localhost:11434/v1/chat/completions"
         else:
             endpoint = "https://api.openai.com/v1/chat/completions"
-            headers["Authorization"] = f"Bearer {self.api_key}"
 
         payload = {
             "model": self.model_name,
