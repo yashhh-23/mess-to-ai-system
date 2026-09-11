@@ -155,8 +155,11 @@ def execute_master_pipeline(config_path: str = "configs/config.yaml", mode: str 
         'retrieval_indexed_conversation_ids': retrieval_indexed_ids
     }
 
-    # Generate run_id for evaluation provenance tracking
-    run_id = time.strftime("%Y-%m-%dT%H%M%SZ", time.gmtime())
+    # Generate run_id for evaluation provenance tracking with UUID suffix
+    import uuid
+    timestamp = time.strftime("%Y-%m-%dT%H%M%SZ", time.gmtime())
+    short_uuid = uuid.uuid4().hex[:8]
+    run_id = f"{timestamp}_{short_uuid}"
     run_dir = os.path.join("results", "runs", run_id)
 
     # Save Model Artifact Metadata Manifest
@@ -190,19 +193,27 @@ def execute_master_pipeline(config_path: str = "configs/config.yaml", mode: str 
         'brand_metadata_checksum': compute_file_hash(brand_meta_path),
         'intent_model_checksum': compute_file_hash(config['paths']['intent_model']),
         'vector_store_checksum': compute_file_hash(config['paths']['vector_store']),
-        'pipeline_status': 'FRESH_REPRODUCED'
+        'pipeline_status': 'EVALUATING'
     }
     with open(metadata_path, 'w', encoding='utf-8') as f:
         json.dump(metadata, f, indent=2)
-    print(f"\n[Model Metadata] Saved artifact metadata manifest to {metadata_path}.")
+    print(f"\n[Model Metadata] Saved preliminary artifact metadata manifest (status: EVALUATING) to {metadata_path}.")
 
     # 7. Run Evaluation Harness Benchmark
     print("\n[Step 7/7] Executing Evaluation Benchmark Harness...")
     results = run_evaluation(config_path=config_path, run_id=run_id)
 
+    # Atomic Update: Mark pipeline status as COMPLETED and record evaluation summary
+    metadata['pipeline_status'] = 'COMPLETED'
+    metadata['fresh_reproduced_provenance'] = True
+    metadata['completed_timestamp'] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    with open(metadata_path, 'w', encoding='utf-8') as f:
+        json.dump(metadata, f, indent=2)
+    print(f"[Model Metadata] Updated artifact metadata manifest to status COMPLETED at {metadata_path}.")
+
     elapsed = time.time() - start_time
     print(f"\n==========================================================================================")
-    print(f"       MASTER PIPELINE COMPLETE! Total Execution Time: {elapsed:.2f} seconds (< 15 mins)       ")
+    print(f"       MASTER PIPELINE COMPLETE! Total Execution Time: {elapsed:.2f} seconds (Observed Target: < 15 mins)       ")
     print("==========================================================================================\n")
     return results
 

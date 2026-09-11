@@ -94,32 +94,45 @@ def _write_manifest(
     print(f"[Data Ingest] Data manifest saved to {manifest_path}.")
 
 
-def verify_file_size_against_manifest(file_path: str, manifest_path: str, tolerance: float = 0.05) -> bool:
+def verify_file_integrity_against_manifest(file_path: str, manifest_path: str, tolerance: float = 0.05) -> bool:
     """
-    Verifies that the downloaded or existing file size matches the stored file_size_bytes in data_manifest.json
-    within the specified relative tolerance (default: 5%).
+    Verifies that the downloaded or existing file matches the stored file_size_bytes
+    and file_sha256_sample (64KB fast sample integrity heuristic) in data_manifest.json.
+    Raises RuntimeError on size or sample checksum mismatch.
     """
     if not os.path.exists(file_path) or not os.path.exists(manifest_path):
         return False
-    try:
-        with open(manifest_path, 'r', encoding='utf-8') as f:
-            manifest_data = json.load(f)
-            expected_bytes = manifest_data.get('file_size_bytes')
-            if expected_bytes and expected_bytes > 0:
-                actual_bytes = os.path.getsize(file_path)
-                rel_diff = abs(actual_bytes - expected_bytes) / expected_bytes
-                if rel_diff > tolerance:
-                    raise RuntimeError(
-                        f"[Data Ingest Error] Downloaded file size ({actual_bytes:,} bytes) differs from "
-                        f"manifest expected size ({expected_bytes:,} bytes) by {rel_diff:.2%} (tolerance: {tolerance:.2%})."
-                    )
-                print(f"[Data Ingest] File size verification PASSED ({actual_bytes:,} bytes matches manifest expected {expected_bytes:,} bytes within {tolerance:.2%} tolerance).")
-                return True
-    except Exception as e:
-        if isinstance(e, RuntimeError):
-            raise
-        pass
-    return False
+    with open(manifest_path, 'r', encoding='utf-8') as f:
+        manifest_data = json.load(f)
+
+    # 1. Size verification
+    expected_bytes = manifest_data.get('file_size_bytes')
+    if expected_bytes and expected_bytes > 0:
+        actual_bytes = os.path.getsize(file_path)
+        rel_diff = abs(actual_bytes - expected_bytes) / expected_bytes
+        if rel_diff > tolerance:
+            raise RuntimeError(
+                f"[Data Ingest Error] File size ({actual_bytes:,} bytes) differs from "
+                f"manifest expected size ({expected_bytes:,} bytes) by {rel_diff:.2%} (tolerance: {tolerance:.2%})."
+            )
+
+    # 2. Sample SHA-256 Checksum verification (Fast sample-level integrity heuristic)
+    expected_sample_hash = manifest_data.get('file_sha256_sample')
+    if expected_sample_hash:
+        actual_sample_hash = _sha256_sample(file_path)
+        if actual_sample_hash != expected_sample_hash:
+            raise RuntimeError(
+                f"[Data Ingest Error] File sample SHA-256 checksum ({actual_sample_hash}) "
+                f"differs from manifest expected checksum ({expected_sample_hash}). "
+                "File content is corrupted or has been modified."
+            )
+
+    hash_str = expected_sample_hash[:12] if expected_sample_hash else "N/A"
+    print(f"[Data Ingest] File integrity verification PASSED (Size: {os.path.getsize(file_path):,} bytes, Sample SHA-256: {hash_str}).")
+    return True
+
+# Backward compatibility alias for tests
+verify_file_size_against_manifest = verify_file_integrity_against_manifest
 
 
 def download_twitter_support_data(
@@ -135,7 +148,7 @@ def download_twitter_support_data(
     if os.path.exists(output_path) and os.path.getsize(output_path) > 1_000_000:
         size = os.path.getsize(output_path)
         print(f"[Data Ingest] Existing file found at {output_path} ({size:,} bytes). "
-              "Validating schema before use...")
+              "Validating schema and manifest integrity before use...")
 
         try:
             sample_df = pd.read_csv(output_path, nrows=_VALIDATE_SAMPLE_ROWS)
@@ -147,7 +160,9 @@ def download_twitter_support_data(
                 "Delete the file and re-run to trigger a fresh download."
             ) from e
 
-        verify_file_size_against_manifest(output_path, manifest_path)
+        if os.path.exists(manifest_path):
+            verify_file_integrity_against_manifest(output_path, manifest_path)
+        
         checksum = _sha256_sample(output_path)
         _write_manifest(
             manifest_path, output_path,
@@ -181,7 +196,11 @@ def download_twitter_support_data(
     print("[Data Ingest] Validating downloaded file schema...")
     sample_df = pd.read_csv(output_path, nrows=_VALIDATE_SAMPLE_ROWS)
     validate_twcs_schema(sample_df)
-    verify_file_size_against_manifest(output_path, manifest_path)
+    if os.path.exists(manifest_path):
+        try:
+            verify_file_integrity_against_manifest(output_path, manifest_path)
+        except RuntimeError as e:
+            print(f"[Data Ingest Warning] Fresh download differs from prior manifest: {e}. Updating manifest for new dataset revision.")
 
     checksum = _sha256_sample(output_path)
     _write_manifest(

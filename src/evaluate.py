@@ -439,9 +439,12 @@ def check_artifact_metadata(config_path: str = "configs/config.yaml", metadata_p
 def run_evaluation(config_path: str = "configs/config.yaml", run_id: Optional[str] = None, output_base_dir: Optional[str] = None):
     import time
     import shutil
+    import uuid
     
     if run_id is None:
-        run_id = time.strftime("%Y-%m-%dT%H%M%SZ", time.gmtime())
+        timestamp = time.strftime("%Y-%m-%dT%H%M%SZ", time.gmtime())
+        short_uuid = uuid.uuid4().hex[:8]
+        run_id = f"{timestamp}_{short_uuid}"
 
     base_results_dir = output_base_dir or "results"
     run_dir = os.path.join(base_results_dir, "runs", run_id)
@@ -953,22 +956,37 @@ def run_evaluation(config_path: str = "configs/config.yaml", run_id: Optional[st
     with open(run_results_path, 'w', encoding='utf-8') as f:
         json.dump(output_res, f, indent=2)
 
-    if output_base_dir is None:
-        # 2. Save/copy to results/latest/
-        with open("results/latest/evaluation_results.json", 'w', encoding='utf-8') as f:
-            json.dump(output_res, f, indent=2)
-        if os.path.exists(run_audit_path):
-            shutil.copyfile(run_audit_path, "results/latest/judge_audit_log.jsonl")
+    # 2. Save/copy to latest directory under base_results_dir
+    latest_dir = os.path.join(base_results_dir, "latest")
+    os.makedirs(latest_dir, exist_ok=True)
+    with open(os.path.join(latest_dir, "evaluation_results.json"), 'w', encoding='utf-8') as f:
+        json.dump(output_res, f, indent=2)
+    if os.path.exists(run_audit_path):
+        shutil.copyfile(run_audit_path, os.path.join(latest_dir, "judge_audit_log.jsonl"))
 
-        # 3. Save/copy to top-level results/ for backwards compatibility
+    # 3. Write explicit pointer manifest in latest_dir
+    latest_manifest = {
+        'latest_run_id': run_id,
+        'run_directory': run_dir,
+        'run_results_path': run_results_path,
+        'run_audit_path': run_audit_path,
+        'updated_at': time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    }
+    with open(os.path.join(latest_dir, "latest_manifest.json"), 'w', encoding='utf-8') as f:
+        json.dump(latest_manifest, f, indent=2)
+
+    if output_base_dir is None:
+        # Top-level results/ copies for backward compatibility
+        with open("results/latest_manifest.json", 'w', encoding='utf-8') as f:
+            json.dump(latest_manifest, f, indent=2)
         with open("results/evaluation_results.json", 'w', encoding='utf-8') as f:
             json.dump(output_res, f, indent=2)
         if os.path.exists(run_audit_path):
             shutil.copyfile(run_audit_path, "results/judge_audit_log.jsonl")
         
-        print(f"[Evaluation Harness] Saved run {run_id} benchmark metrics to {run_results_path} and results/latest/.")
+        print(f"[Evaluation Harness] Saved run {run_id} benchmark metrics to {run_results_path}, results/latest/, and latest_manifest.json.")
     else:
-        print(f"[Evaluation Harness] Saved isolated test run {run_id} benchmark metrics to {run_results_path}.")
+        print(f"[Evaluation Harness] Saved isolated test run {run_id} benchmark metrics to {run_results_path} and {latest_dir}.")
     return output_res
 
 if __name__ == "__main__":

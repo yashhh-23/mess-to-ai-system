@@ -1,10 +1,10 @@
 {
-  "run_id": "2026-09-11T122124Z",
-  "run_dir": "results\\runs\\2026-09-11T122124Z",
-  "train_timestamp": "2026-09-11T12:21:24Z",
+  "run_id": "2026-09-11T142337Z_de50caa0",
+  "run_dir": "results\\runs\\2026-09-11T142337Z_de50caa0",
+  "train_timestamp": "2026-09-11T14:23:37Z",
   "download_required_for_full_repro": false,
-  "git_commit_sha": "ee81bb84daaa4b575842c9605bb897e7f2ab5c56",
-  "source_code_hash": "37b4aa4d6c9ceeb8dcc6aa4946470a820750d174bba7d184e9339a7b12bf3e23",
+  "git_commit_sha": "d43d1215a55838d384e8ea5bdf9baa223fb97a1b",
+  "source_code_hash": "7656bd95f00be77fec117ce8d3a7f03f64b4a36491b0f75210bad499fb616a1f",
   "python_version": "3.13.7",
   "library_versions": {
     "scikit-learn": "1.9.0",
@@ -16,28 +16,28 @@
   "resolved_brand_handle": "@AmazonHelp",
   "sample_counts": {
     "total_threads": 20000,
-    "train_count": 19800,
+    "train_count": 19801,
     "golden_count": 200,
-    "vector_index_count": 19800
+    "vector_index_count": 19801
   },
   "train_class_distribution": {
-    "delivery_delay": 1032,
-    "refund_request": 958,
-    "complaint_about_service": 875,
-    "general_inquiry": 13570,
-    "damaged_wrong_item": 173,
-    "cancellation": 285,
     "order_status": 1445,
-    "account_access": 1462
+    "account_access": 1462,
+    "refund_request": 958,
+    "general_inquiry": 13570,
+    "complaint_about_service": 876,
+    "damaged_wrong_item": 173,
+    "delivery_delay": 1032,
+    "cancellation": 285
   },
   "data_leakage_guard": {
     "golden_conversation_ids_count": 200,
-    "trained_conversation_ids_count": 19800,
-    "retrieval_indexed_ids_count": 19800,
+    "trained_conversation_ids_count": 19801,
+    "retrieval_indexed_ids_count": 19801,
     "exact_id_leakage_classifier_count": 0,
     "exact_id_leakage_retriever_count": 0,
     "near_duplicate_diagnostics": {
-      "max_near_duplicate_similarity": 0.6828,
+      "max_near_duplicate_similarity": 0.6829,
       "near_duplicate_count": 0,
       "similarity_threshold": 0.85,
       "status": "PASSED",
@@ -4019,7 +4019,6 @@
       "conv_115962",
       "conv_115963",
       "conv_115966",
-      "conv_115977",
       "conv_117831",
       "conv_117839",
       "conv_117846",
@@ -10271,7 +10270,6 @@
       "conv_265001",
       "conv_264997",
       "conv_265004",
-      "conv_265013",
       "conv_265961",
       "conv_265960",
       "conv_265992",
@@ -20045,7 +20043,10 @@
       "conv_465126",
       "conv_459943",
       "conv_465141",
-      "conv_465154"
+      "conv_465154",
+      "conv_465155",
+      "conv_465162",
+      "conv_465168"
     ],
     "retrieval_indexed_conversation_ids": [
       "conv_616",
@@ -23821,7 +23822,6 @@
       "conv_115962",
       "conv_115963",
       "conv_115966",
-      "conv_115977",
       "conv_117831",
       "conv_117839",
       "conv_117846",
@@ -30073,7 +30073,6 @@
       "conv_265001",
       "conv_264997",
       "conv_265004",
-      "conv_265013",
       "conv_265961",
       "conv_265960",
       "conv_265992",
@@ -39847,17 +39846,22 @@
       "conv_465126",
       "conv_459943",
       "conv_465141",
-      "conv_465154"
+      "conv_465154",
+      "conv_465155",
+      "conv_465162",
+      "conv_465168"
     ]
   },
   "config_hash": "932a3e59cc94657fe13aa6dbe22ab78e",
   "raw_data_checksum": "73e961b2837626de89618a3f35f7bd6c",
-  "dataset_manifest_checksum": "a69e820b6d6e37be9b590d50096fed4c",
-  "processed_data_checksum": "34dddd80a9e7519b61c05b8dcb5082cb",
+  "dataset_manifest_checksum": "3f1dc1d07bdacfb38b5cf3d8137ac6c3",
+  "processed_data_checksum": "85886bd007fb1eeff08509e0c466617b",
   "golden_set_checksum": "426e2e9d2b2b7a295b65b3f8441f6e39",
   "human_calibration_checksum": "73bc92d3d18e2906cc8681bc4f6d535f",
   "brand_metadata_checksum": "87bd43702f9bad1996ded123cb964928",
-  "intent_model_checksum": "ed2b1a2d2771b0fe301e93d470edd083",
-  "vector_store_checksum": "d8926b6b4ad25ce72f81308adb6710d5",
-  "pipeline_status": "FRESH_REPRODUCED"
+  "intent_model_checksum": "dfa6ef9a1861ff6f64da93152ed6875e",
+  "vector_store_checksum": "a58a84570e444df178e07173d12e2c36",
+  "pipeline_status": "COMPLETED",
+  "fresh_reproduced_provenance": true,
+  "completed_timestamp": "2026-09-11T14:23:57Z"
 }

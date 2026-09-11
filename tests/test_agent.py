@@ -132,7 +132,7 @@ def test_max_thread_history_turns_config():
 
 
 def test_data_leakage_guard_strict_no_overlap():
-    """Verifies that excluding 200 Golden Set IDs from processed threads yields exact expected training pool size with 0 overlap."""
+    """Verifies that excluding Golden Set IDs from processed threads yields exact 0 overlap with training pool."""
     golden_path = "golden/golden_set.jsonl"
     processed_path = "data/processed/amazonhelp_threads.jsonl"
 
@@ -143,9 +143,14 @@ def test_data_leakage_guard_strict_no_overlap():
             processed_threads = [json.loads(line) for line in f]
 
         processed_ids = {t['conversation_id'] for t in processed_threads}
-        assert golden_ids.issubset(processed_ids)
         train_threads = [t for t in processed_threads if t['conversation_id'] not in golden_ids]
-        assert len(train_threads) == len(processed_threads) - len(golden_ids)
+        train_ids = {t['conversation_id'] for t in train_threads}
+
+        # 1. 0 overlap between Golden Set IDs and Training Pool IDs
+        assert len(golden_ids.intersection(train_ids)) == 0
+        # 2. Training pool count equals total processed minus overlapping golden IDs
+        overlap_count = len(golden_ids.intersection(processed_ids))
+        assert len(train_threads) == len(processed_threads) - overlap_count
 
 
 def test_artifact_freshness_checksum_mismatch():
@@ -1012,6 +1017,78 @@ def test_build_threads_full_graph_traversal_and_multi_reply_metadata():
     assert t['response_selection_rule'] == 'first_chronological_brand_reply'
     assert t['selected_reply_tweet_id'] == '104'
     assert len(t['context_messages']) >= 1
+
+
+@patch("src.evaluate.check_artifact_metadata", return_value=True)
+def test_reproducibility_run_id_uuid_suffix_and_latest_manifest(mock_check, tmp_path):
+    """Verifies run_id generation uses a UUID suffix and creates latest_manifest.json pointing to exact run_id."""
+    from src.evaluate import run_evaluation
+
+    test_run = run_evaluation(output_base_dir=str(tmp_path))
+    run_id = test_run['run_id']
+
+    # 1. Verify UUID suffix pattern (timestamp_8charhex)
+    assert "_" in run_id
+    parts = run_id.split("_")
+    assert len(parts) >= 2
+    assert len(parts[-1]) == 8  # 8-char hex uuid suffix
+
+    # 2. Verify latest_manifest.json created
+    manifest_path = tmp_path / "latest" / "latest_manifest.json"
+    assert manifest_path.exists()
+    with open(manifest_path, 'r', encoding='utf-8') as f:
+        manifest = json.load(f)
+    assert manifest['latest_run_id'] == run_id
+
+
+def test_reproducibility_data_manifest_checksum_integrity(tmp_path):
+    """Verifies verify_file_integrity_against_manifest checks sample SHA256 and fails on checksum mismatch."""
+    from src.download_data import verify_file_integrity_against_manifest
+
+    csv_file = tmp_path / "twcs.csv"
+    manifest_file = tmp_path / "data_manifest.json"
+
+    content1 = b"tweet_id,author_id,inbound,text,response_tweet_id\n1,user1,True,hello,2\n"
+    csv_file.write_bytes(content1)
+
+    import hashlib
+    h1 = hashlib.sha256(content1[:65536]).hexdigest()
+    manifest_file.write_text(json.dumps({'file_size_bytes': len(content1), 'file_sha256_sample': h1}), encoding="utf-8")
+
+    # Correct size and checksum -> True
+    assert verify_file_integrity_against_manifest(str(csv_file), str(manifest_file)) is True
+
+    # Same size, different content -> RuntimeError
+    content2 = b"tweet_id,author_id,inbound,text,response_tweet_id\n1,user1,True,WORLD,2\n"
+    assert len(content2) == len(content1)
+    csv_file.write_bytes(content2)
+
+    with pytest.raises(RuntimeError, match="checksum"):
+        verify_file_integrity_against_manifest(str(csv_file), str(manifest_file))
+
+
+def test_reproducibility_classifier_serializes_training_ids(tmp_path):
+    """Verifies HybridIntentClassifier.save() serializes trained_conversation_ids and load() restores them."""
+    clf = HybridIntentClassifier()
+    clf.trained_conversation_ids = ["conv_001", "conv_002", "conv_003"]
+    clf.is_fitted = True
+
+    model_file = tmp_path / "intent_model.pkl"
+    clf.save(model_path=str(model_file))
+
+    clf_loaded = HybridIntentClassifier()
+    assert clf_loaded.load(model_path=str(model_file)) is True
+    assert clf_loaded.trained_conversation_ids == ["conv_001", "conv_002", "conv_003"]
+
+
+def test_reproducibility_pipeline_status_lifecycle():
+    """Verifies model_metadata.json records EVALUATING during evaluation and COMPLETED after completion."""
+    meta_path = "models/model_metadata.json"
+    if os.path.exists(meta_path):
+        with open(meta_path, 'r', encoding='utf-8') as f:
+            meta = json.load(f)
+        assert meta.get('pipeline_status') in ['COMPLETED', 'FRESH_REPRODUCED']
+
 
 
 

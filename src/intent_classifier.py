@@ -174,9 +174,22 @@ class HybridIntentClassifier:
 
     def save(self, model_path: str = "models/intent_classifier.pkl"):
         os.makedirs(os.path.dirname(model_path), exist_ok=True)
+        from src.evaluate import compute_source_code_hash
+        
+        trained_ids = getattr(self, 'trained_conversation_ids', [])
+        payload = {
+            'vectorizer': self.vectorizer,
+            'model': self.model,
+            'is_fitted': self.is_fitted,
+            'trained_conversation_ids': trained_ids,
+            'taxonomy': self.taxonomy,
+            'confidence_threshold': self.confidence_threshold,
+            'source_code_hash': compute_source_code_hash(),
+            'config_path': self.config_path
+        }
         with open(model_path, 'wb') as f:
-            pickle.dump({'vectorizer': self.vectorizer, 'model': self.model, 'is_fitted': self.is_fitted}, f)
-        print(f"[Intent Classifier] Saved model to {model_path}.")
+            pickle.dump(payload, f)
+        print(f"[Intent Classifier] Saved model (with {len(trained_ids)} trained conversation IDs) to {model_path}.")
 
     def load(self, model_path: str = "models/intent_classifier.pkl"):
         if os.path.exists(model_path):
@@ -185,7 +198,12 @@ class HybridIntentClassifier:
                 self.vectorizer = data['vectorizer']
                 self.model = data['model']
                 self.is_fitted = data['is_fitted']
-            print(f"[Intent Classifier] Loaded model from {model_path}.")
+                self.trained_conversation_ids = data.get('trained_conversation_ids', [])
+                if 'taxonomy' in data:
+                    self.taxonomy = data['taxonomy']
+                if 'confidence_threshold' in data:
+                    self.confidence_threshold = data['confidence_threshold']
+            print(f"[Intent Classifier] Loaded model from {model_path} (Restored {len(self.trained_conversation_ids)} trained conversation IDs).")
             return True
         return False
 

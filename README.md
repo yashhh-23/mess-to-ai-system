@@ -96,7 +96,7 @@ export GEMINI_API_KEY="your-gemini-key"
 *Note*: If no API key is provided, the harness automatically and transparently runs in **Heuristic Fallback Mode**, recording all details to `results/judge_audit_log.jsonl`.
 
 ### 3. Master Reproducibility Pipeline Execution
-Run the complete end-to-end pipeline (data ingest, thread cleaning, golden verification, model training, indexing, and evaluation) (~25s execution time with pre-cached raw data, or under 15 minutes on fresh download):
+Run the complete end-to-end pipeline (data ingest, thread cleaning, golden verification, model training, indexing, and evaluation) (observed local execution time: ~25s with pre-cached raw data, or under 15 minutes for cold-start retraining & indexing on standard dual-core/8GB RAM environments):
 
 ```bash
 python run_pipeline.py

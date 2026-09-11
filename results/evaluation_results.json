@@ -1,9 +1,9 @@
 {
-  "run_id": "2026-09-11T122124Z",
-  "run_directory": "results\\runs\\2026-09-11T122124Z",
+  "run_id": "2026-09-11T142337Z_de50caa0",
+  "run_directory": "results\\runs\\2026-09-11T142337Z_de50caa0",
   "resolved_brand_handle": "@AmazonHelp",
   "near_duplicate_diagnostics": {
-    "max_near_duplicate_similarity": 0.6828,
+    "max_near_duplicate_similarity": 0.6829,
     "near_duplicate_count": 0,
     "similarity_threshold": 0.85,
     "status": "PASSED",
@@ -41,8 +41,8 @@
     "escalation_ratio": 0.2
   },
   "classifier_confidence_calibration": {
-    "mean_confidence": 0.8186,
-    "min_confidence": 0.3408,
+    "mean_confidence": 0.819,
+    "min_confidence": 0.3405,
     "max_confidence": 0.9856,
     "calibration_type": "weak_label_calibrated_CalibratedClassifierCV",
     "calibration_disclosure": "Classifier confidence scores are calibrated using CalibratedClassifierCV(cv=3) against weak-supervised rule labels (_rule_fallback). Operational probability calibration claims in live production require human ground-truth evaluation."
@@ -59,10 +59,10 @@
   },
   "benchmark_results": {
     "Main Agent": {
-      "Intent Macro F1": 0.8601,
-      "Intent Macro F1 95% CI": "[0.8054, 0.9024]",
-      "Intent Accuracy": 0.855,
-      "Intent Accuracy 95% CI": "[0.8050, 0.9000]",
+      "Intent Macro F1": 0.8542,
+      "Intent Macro F1 95% CI": "[0.7976, 0.8972]",
+      "Intent Accuracy": 0.85,
+      "Intent Accuracy 95% CI": "[0.7950, 0.8950]",
       "Per-Class Intent F1": {
         "order_status": {
           "precision": 0.8696,
@@ -71,9 +71,9 @@
           "support": 24
         },
         "delivery_delay": {
-          "precision": 0.8947,
-          "recall": 0.8095,
-          "f1_score": 0.85,
+          "precision": 0.8889,
+          "recall": 0.7619,
+          "f1_score": 0.8205,
           "support": 21
         },
         "refund_request": {
@@ -89,9 +89,9 @@
           "support": 26
         },
         "account_access": {
-          "precision": 0.9583,
+          "precision": 0.92,
           "recall": 0.8846,
-          "f1_score": 0.92,
+          "f1_score": 0.902,
           "support": 26
         },
         "cancellation": {
@@ -132,14 +132,14 @@
       "Reply Safety Pass Rate": 1.0,
       "Reply Safety Violation Rate": 0.0,
       "Mean Judge Score (0-7)": 6.15,
-      "Mean Judge Score 95% CI": "[6.0660, 6.2285]",
-      "Mean Reply Similarity": 0.1271,
-      "Mean Reply Similarity 95% CI": "[0.1172, 0.1378]",
+      "Mean Judge Score 95% CI": "[6.0711, 6.2374]",
+      "Mean Reply Similarity": 0.1323,
+      "Mean Reply Similarity 95% CI": "[0.1219, 0.1438]",
       "quality_by_generation_mode": {
         "Evidence-Adapted-Fallback": {
           "count": 168,
-          "mean_judge_score": 6.0595,
-          "mean_reply_similarity": 0.1293,
+          "mean_judge_score": 6.0655,
+          "mean_reply_similarity": 0.1355,
           "safety_violation_rate": 0.0
         },
         "Template-Fallback": {
@@ -158,25 +158,25 @@
         },
         "fallback_generated": {
           "count": 198,
-          "mean_judge_score": 6.1465,
-          "mean_reply_similarity": 0.1271,
+          "mean_judge_score": 6.1515,
+          "mean_reply_similarity": 0.1323,
           "safety_violation_rate": 0.0
         }
       },
-      "Secondary Composite Headline Score": 0.5557,
-      "Secondary Composite Headline Score 95% CI": "[0.5080, 0.6109]",
-      "Headline Score": 0.5557,
+      "Secondary Composite Headline Score": 0.5539,
+      "Secondary Composite Headline Score 95% CI": "[0.5054, 0.6080]",
+      "Headline Score": 0.5539,
       "headline_score_disclosure": "Reported strictly as a secondary internal composite dashboard metric. Primary benchmark claims lead with unweighted operational metrics and 95% bootstrap confidence intervals.",
       "bootstrap_ci_details": {
         "n_bootstraps": 1000,
         "confidence_level": 95.0,
         "intent_accuracy_ci": [
-          0.805,
-          0.9
+          0.795,
+          0.895
         ],
         "intent_macro_f1_ci": [
-          0.8054,
-          0.9024
+          0.7976,
+          0.8972
         ],
         "escalation_precision_ci": [
           0.0,
@@ -195,16 +195,16 @@
           1.0
         ],
         "mean_judge_score_ci": [
-          6.066,
-          6.2285
+          6.0711,
+          6.2374
         ],
         "mean_reply_similarity_ci": [
-          0.1172,
-          0.1378
+          0.1219,
+          0.1438
         ],
         "secondary_composite_headline_score_ci": [
-          0.508,
-          0.6109
+          0.5054,
+          0.608
         ]
       },
       "evaluator_mode_counts": {
