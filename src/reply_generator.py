@@ -84,7 +84,7 @@ class PostGenerationValidator:
             punct = "" if sanitized_text.rstrip().endswith((".", "?", "!")) else "."
             sanitized_text = f"{sanitized_text.rstrip()}{punct} Please visit <URL> for the next step."
 
-        # 4. Channel-Aware Sensitive Data Policy & Safety Check
+        # 4. Channel-Aware Clause-Level Sensitive Data Policy & Safety Check
         safe_advisory_pattern = r"(do not|don't|never|avoid|not)\s+(share|post|tweet|send|provide|give)\b|for your security|keep your \w+ safe"
         
         # Highly sensitive credentials prohibited across ALL channels (public, dm, secure_form)
@@ -103,12 +103,23 @@ class PostGenerationValidator:
             r"share your (email|phone|address|contact details)"
         ]
 
-        text_lower = sanitized_text.lower()
-        has_prohibited_cred = any(term in text_lower for term in strict_prohibited_credentials)
-        has_public_pii_solicit = (channel == "public") and any(re.search(pat, text_lower) for pat in public_pii_solicit_patterns)
-        is_negated_safe_advisory = bool(re.search(safe_advisory_pattern, text_lower))
+        clauses = re.split(r'[\.\!\?;\n—–|-]+', sanitized_text)
+        is_safe = True
+        for clause in clauses:
+            clause_clean = clause.strip()
+            if not clause_clean:
+                continue
+            clause_lower = clause_clean.lower()
+            has_prohibited = any(term in clause_lower for term in strict_prohibited_credentials)
+            has_public_solicit = (channel == "public") and any(re.search(pat, clause_lower) for pat in public_pii_solicit_patterns)
 
-        if (has_prohibited_cred or has_public_pii_solicit) and not is_negated_safe_advisory:
+            if has_prohibited or has_public_solicit:
+                is_clause_negated = bool(re.search(safe_advisory_pattern, clause_lower))
+                if not is_clause_negated:
+                    is_safe = False
+                    break
+
+        if not is_safe:
             validation['safety_pass'] = False
             if channel == "public":
                 sanitized_text = "Hi <USER>, please do not share personal or payment details here. Send us a DM so we can look into this securely: <URL>."

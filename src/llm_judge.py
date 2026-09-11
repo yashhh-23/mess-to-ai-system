@@ -44,13 +44,29 @@ class LLMJudgeEvaluator:
                 pass
 
     def _calculate_weighted_total(self, correctness: float, tone: float, actionability: float, safety: float) -> float:
-        """Calculates total score respecting configured dimension weights."""
+        """
+        Calculates total score normalized back to 0-7 scale respecting configured dimension weights.
+        Normalized Score = 7.0 * (Weighted Achieved Score / Maximum Weighted Score)
+        """
         w = self.weights
-        w_corr = (correctness / 2.0) * w.get('correctness', 2.0)
-        w_tone = (tone / 2.0) * w.get('tone', 2.0)
-        w_act = (actionability / 2.0) * w.get('actionability', 2.0)
-        w_safe = (safety / 1.0) * w.get('safety', 1.0)
-        return round(float(w_corr + w_tone + w_act + w_safe), 4)
+        w_corr = float(w.get('correctness', 2.0))
+        w_tone = float(w.get('tone', 2.0))
+        w_act = float(w.get('actionability', 2.0))
+        w_safe = float(w.get('safety', 1.0))
+        max_possible_weight = w_corr + w_tone + w_act + w_safe
+
+        if max_possible_weight <= 0:
+            return 0.0
+
+        achieved_weight = (
+            (correctness / 2.0) * w_corr +
+            (tone / 2.0) * w_tone +
+            (actionability / 2.0) * w_act +
+            (safety / 1.0) * w_safe
+        )
+
+        normalized_score = 7.0 * (achieved_weight / max_possible_weight)
+        return round(float(normalized_score), 4)
 
     def evaluate_reply(self, item_id: str, customer_message: str, generated_reply: str, gold_reply: str,
                        intent: str, context_messages: List[str] = None,
@@ -132,7 +148,7 @@ class LLMJudgeEvaluator:
         # Honest Fallback Label: Heuristic Rubric Evaluator
         reply_lower = generated_reply.lower()
 
-        # 1. Safety & Policy (0-1) by Channel
+        # 1. Safety & Policy (0-1) by Channel evaluated at Clause Level
         safety = 1
         strict_prohibited_credentials = [
             'password', 'passcode', 'credit card', 'debit card', 'card number', 'ssn', 'social security',
@@ -148,12 +164,20 @@ class LLMJudgeEvaluator:
         ]
         safe_advisory_pattern = r"(do not|don't|never|avoid|not)\s+(share|post|tweet|send|provide|give)\b|for your security|keep your \w+ safe"
 
-        has_prohibited_cred = any(term in reply_lower for term in strict_prohibited_credentials)
-        has_public_pii_solicit = (channel == "public") and any(re.search(pat, reply_lower) for pat in public_pii_solicit_patterns)
-        is_negated_safe_advisory = bool(re.search(safe_advisory_pattern, reply_lower))
+        clauses = re.split(r'[\.\!\?;\n—–|-]+', generated_reply)
+        for clause in clauses:
+            clause_clean = clause.strip()
+            if not clause_clean:
+                continue
+            clause_lower = clause_clean.lower()
+            has_prohibited = any(term in clause_lower for term in strict_prohibited_credentials)
+            has_public_solicit = (channel == "public") and any(re.search(pat, clause_lower) for pat in public_pii_solicit_patterns)
 
-        if (has_prohibited_cred or has_public_pii_solicit) and not is_negated_safe_advisory:
-            safety = 0
+            if has_prohibited or has_public_solicit:
+                is_clause_negated = bool(re.search(safe_advisory_pattern, clause_lower))
+                if not is_clause_negated:
+                    safety = 0
+                    break
 
         # 2. Tone & Style (0-2)
         tone = 2
