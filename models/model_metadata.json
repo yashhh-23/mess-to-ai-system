@@ -2,6 +2,7 @@
   "run_id": "2026-09-11T020356Z",
   "run_dir": "results\\runs\\2026-09-11T020356Z",
   "train_timestamp": "2026-09-11T02:03:56Z",
+  "download_required_for_full_repro": false,
   "git_commit_sha": "76852f1e1a2f8bbe245444bad76b961cc9a1a318",
   "source_code_hash": "21e7cc1dd2642a998dfca9de84038a114d11c535e679bb65da25f9d751672886",
   "python_version": "3.13.7",

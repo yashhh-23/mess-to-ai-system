@@ -361,13 +361,28 @@ def check_artifact_metadata(config_path: str = "configs/config.yaml", metadata_p
         if actual_src_hash != expected_src_hash:
             mismatches.append(f"source_code_hash (expected {expected_src_hash[:8]}..., got {actual_src_hash[:8]}...)")
 
-    # Verify raw CSV checksum if file exists; if absent, require trusted data_manifest.json
+    # Verify raw CSV checksum & file size if file exists; if absent, inspect download_required_for_full_repro flag & manifest
+    download_required_flag = meta.get('download_required_for_full_repro', not os.path.exists(raw_csv_path))
     expected_raw_checksum = meta.get('raw_data_checksum')
     if expected_raw_checksum:
         if os.path.exists(raw_csv_path):
             actual_raw = _compute_md5(raw_csv_path)
             if actual_raw != expected_raw_checksum:
                 mismatches.append(f"raw_data_checksum ({raw_csv_path}: expected {expected_raw_checksum[:8]}..., got {actual_raw[:8]}...)")
+            
+            # Check file size against manifest if available
+            if os.path.exists(manifest_path):
+                try:
+                    with open(manifest_path, 'r', encoding='utf-8') as f:
+                        m_data = json.load(f)
+                        expected_bytes = m_data.get('file_size_bytes')
+                        if expected_bytes and expected_bytes > 0:
+                            actual_bytes = os.path.getsize(raw_csv_path)
+                            rel_diff = abs(actual_bytes - expected_bytes) / expected_bytes
+                            if rel_diff > 0.05:
+                                mismatches.append(f"raw_data_file_size ({raw_csv_path}: actual {actual_bytes:,} bytes differs from manifest expected {expected_bytes:,} bytes by {rel_diff:.2%})")
+                except Exception:
+                    pass
         else:
             if not os.path.exists(manifest_path):
                 raise RuntimeError(
@@ -385,10 +400,15 @@ def check_artifact_metadata(config_path: str = "configs/config.yaml", metadata_p
                     f"[Artifact Validation Error] Raw data file '{raw_csv_path}' is missing "
                     f"and manifest at '{manifest_path}' is invalid: {e}"
                 ) from e
-            print(
-                f"[Artifact Validation] Raw CSV absent ({raw_csv_path}); using processed data with trusted manifest ({manifest_path}). "
-                "Re-run pipeline if you need to retrain from source."
+            
+            import warnings
+            warn_msg = (
+                f"[Artifact Validation WARNING] Raw CSV absent ({raw_csv_path}); download_required_for_full_repro={download_required_flag}. "
+                f"Using processed data with trusted manifest ({manifest_path}). "
+                "Re-run 'python src/download_data.py' if full retraining from source is required."
             )
+            warnings.warn(warn_msg, UserWarning)
+            print(warn_msg)
 
     for key, (fpath, expected) in checks.items():
         if not expected:

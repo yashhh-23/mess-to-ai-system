@@ -477,8 +477,28 @@ def test_missing_raw_csv_handling_in_artifact_validation(tmp_path):
     with patch("src.evaluate.compute_source_code_hash", return_value="valid_hash"), \
          patch("src.evaluate._compute_md5", side_effect=mock_compute_md5), \
          patch("os.path.exists", side_effect=mock_exists_with_manifest):
-        res = check_artifact_metadata(metadata_path=str(meta_file))
-        assert res is True
+        with pytest.warns(UserWarning, match="Raw CSV absent"):
+            res = check_artifact_metadata(metadata_path=str(meta_file))
+            assert res is True
+
+
+def test_download_file_size_verification_against_manifest(tmp_path):
+    """Verifies that verify_file_size_against_manifest validates downloaded size within tolerance and fails if size differs."""
+    from src.download_data import verify_file_size_against_manifest
+
+    csv_file = tmp_path / "twcs.csv"
+    manifest_file = tmp_path / "data_manifest.json"
+
+    csv_file.write_bytes(b"a" * 10000)
+    manifest_file.write_text(json.dumps({'file_size_bytes': 10000}), encoding="utf-8")
+
+    # Within tolerance -> True
+    assert verify_file_size_against_manifest(str(csv_file), str(manifest_file), tolerance=0.05) is True
+
+    # Exceeding tolerance -> RuntimeError
+    manifest_file.write_text(json.dumps({'file_size_bytes': 20000}), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="differs from manifest expected size"):
+        verify_file_size_against_manifest(str(csv_file), str(manifest_file), tolerance=0.05)
 
 
 def test_golden_set_ids_disjoint_from_classifier_and_retriever():

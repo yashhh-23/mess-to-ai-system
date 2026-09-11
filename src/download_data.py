@@ -94,24 +94,40 @@ def _write_manifest(
     print(f"[Data Ingest] Data manifest saved to {manifest_path}.")
 
 
+def verify_file_size_against_manifest(file_path: str, manifest_path: str, tolerance: float = 0.05) -> bool:
+    """
+    Verifies that the downloaded or existing file size matches the stored file_size_bytes in data_manifest.json
+    within the specified relative tolerance (default: 5%).
+    """
+    if not os.path.exists(file_path) or not os.path.exists(manifest_path):
+        return False
+    try:
+        with open(manifest_path, 'r', encoding='utf-8') as f:
+            manifest_data = json.load(f)
+            expected_bytes = manifest_data.get('file_size_bytes')
+            if expected_bytes and expected_bytes > 0:
+                actual_bytes = os.path.getsize(file_path)
+                rel_diff = abs(actual_bytes - expected_bytes) / expected_bytes
+                if rel_diff > tolerance:
+                    raise RuntimeError(
+                        f"[Data Ingest Error] Downloaded file size ({actual_bytes:,} bytes) differs from "
+                        f"manifest expected size ({expected_bytes:,} bytes) by {rel_diff:.2%} (tolerance: {tolerance:.2%})."
+                    )
+                print(f"[Data Ingest] File size verification PASSED ({actual_bytes:,} bytes matches manifest expected {expected_bytes:,} bytes within {tolerance:.2%} tolerance).")
+                return True
+    except Exception as e:
+        if isinstance(e, RuntimeError):
+            raise
+        pass
+    return False
+
+
 def download_twitter_support_data(
     output_path: str = "data/raw/twcs.csv",
     manifest_path: str = "data/raw/data_manifest.json",
 ) -> str:
     """
     Ensures twcs.csv is present, schema-valid, and recorded in a manifest.
-
-    If the file already exists:
-      - A sample is read and schema-validated.
-      - The manifest is written/updated with the current checksum and timestamp.
-      - A stale, corrupted, or wrong-schema file is caught immediately.
-
-    If the file does not exist (or fails validation):
-      - Only the primary TWCS source is attempted.
-      - No fallback to a structurally incompatible dataset is performed.
-        (The pipeline requires 'inbound' and 'response_tweet_id', which are
-        specific to TWCS and cannot be reliably mapped from other datasets.)
-      - If the download fails, a clear error is raised.
     """
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
@@ -131,6 +147,7 @@ def download_twitter_support_data(
                 "Delete the file and re-run to trigger a fresh download."
             ) from e
 
+        verify_file_size_against_manifest(output_path, manifest_path)
         checksum = _sha256_sample(output_path)
         _write_manifest(
             manifest_path, output_path,
@@ -154,14 +171,9 @@ def download_twitter_support_data(
         print(f"[Data Ingest] Download complete. Saved to {output_path} "
               f"({os.path.getsize(output_path):,} bytes).")
     except Exception as e:
-        # No fallback to a different dataset — it would require a full
-        # source-specific adapter and cannot be silently substituted.
         raise RuntimeError(
             f"[Data Ingest] Primary TWCS download failed: {e}\n\n"
-            "No compatible fallback source is configured.  Alternatives that "
-            "do not contain the required fields 'inbound' and 'response_tweet_id' "
-            "(structural to TWCS) cannot be safely substituted without a dedicated "
-            "schema adapter.  Please download twcs.csv manually and place it at "
+            "No compatible fallback source is configured. Please download twcs.csv manually and place it at "
             f"'{output_path}', or fix network connectivity and retry."
         ) from e
 
@@ -169,6 +181,7 @@ def download_twitter_support_data(
     print("[Data Ingest] Validating downloaded file schema...")
     sample_df = pd.read_csv(output_path, nrows=_VALIDATE_SAMPLE_ROWS)
     validate_twcs_schema(sample_df)
+    verify_file_size_against_manifest(output_path, manifest_path)
 
     checksum = _sha256_sample(output_path)
     _write_manifest(

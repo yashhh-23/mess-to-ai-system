@@ -130,11 +130,14 @@ def execute_master_pipeline(config_path: str = "configs/config.yaml"):
 
     # Save Model Artifact Metadata Manifest
     manifest_checksum = compute_file_hash("data/raw/data_manifest.json")
+    raw_data_path = config['paths']['raw_data']
+    raw_absent = not os.path.exists(raw_data_path)
     metadata_path = "models/model_metadata.json"
     metadata = {
         'run_id': run_id,
         'run_dir': run_dir,
         'train_timestamp': time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        'download_required_for_full_repro': raw_absent,
         'git_commit_sha': get_git_commit_sha(),
         'source_code_hash': compute_source_code_hash(),
         'python_version': sys.version.split()[0],
