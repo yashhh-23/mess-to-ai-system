@@ -3,3 +3,5 @@ __pycache__/
 *.pkl
 .pytest_cache/
 results/runs/
+
+results/latest/
