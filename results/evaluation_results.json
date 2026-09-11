@@ -1,6 +1,6 @@
 {
-  "run_id": "test_run_provenance_123",
-  "run_directory": "results/runs/test_run_provenance_123",
+  "run_id": "2026-09-11T013505Z",
+  "run_directory": "results/runs/2026-09-11T013505Z",
   "resolved_brand_handle": "@AmazonHelp",
   "near_duplicate_diagnostics": {
     "max_near_duplicate_similarity": 0.6828,
