@@ -132,7 +132,7 @@ def test_max_thread_history_turns_config():
 
 
 def test_data_leakage_guard_strict_no_overlap():
-    """Verifies 0 ID overlap between golden evaluation set and dev thread training set."""
+    """Verifies that excluding 200 Golden Set IDs from processed threads yields exact expected training pool size with 0 overlap."""
     golden_path = "golden/golden_set.jsonl"
     processed_path = "data/processed/amazonhelp_threads.jsonl"
 
@@ -142,11 +142,10 @@ def test_data_leakage_guard_strict_no_overlap():
         with open(processed_path, 'r', encoding='utf-8') as f:
             processed_threads = [json.loads(line) for line in f]
 
-        train_ids = {t['conversation_id'] for t in processed_threads if t['conversation_id'] not in golden_ids}
-        overlap = golden_ids.intersection(train_ids)
-
-        assert len(golden_ids) == 200
-        assert len(overlap) == 0
+        processed_ids = {t['conversation_id'] for t in processed_threads}
+        assert golden_ids.issubset(processed_ids)
+        train_threads = [t for t in processed_threads if t['conversation_id'] not in golden_ids]
+        assert len(train_threads) == len(processed_threads) - len(golden_ids)
 
 
 def test_artifact_freshness_checksum_mismatch():
@@ -439,45 +438,54 @@ def test_source_code_hash_mismatch_fails_evaluation(tmp_path):
 
 
 def test_golden_set_ids_disjoint_from_classifier_and_retriever():
-    """Verifies golden-set conversation IDs are disjoint from classifier training set and retrieval index."""
+    """Verifies golden-set conversation IDs are disjoint from classifier training set, retrieval index, and model metadata manifest."""
     golden_path = "golden/golden_set.jsonl"
-    processed_path = "data/processed/amazonhelp_threads.jsonl"
+    if not os.path.exists(golden_path):
+        return
 
-    if os.path.exists(golden_path) and os.path.exists(processed_path):
-        with open(golden_path, 'r', encoding='utf-8') as f:
-            golden_ids = {json.loads(line)['conversation_id'] for line in f}
-        with open(processed_path, 'r', encoding='utf-8') as f:
-            processed_threads = [json.loads(line) for line in f]
+    with open(golden_path, 'r', encoding='utf-8') as f:
+        golden_ids = {json.loads(line)['conversation_id'] for line in f}
 
-        train_ids = {t['conversation_id'] for t in processed_threads if t['conversation_id'] not in golden_ids}
-        assert len(golden_ids.intersection(train_ids)) == 0
+    assert len(golden_ids) == 200
 
-        retriever = HistoricalSupportInteractionRetriever()
-        if retriever.load('models/vector_store.pkl'):
-            retrieved_ids = {item.get('conversation_id') for item in retriever.items if 'conversation_id' in item}
-            assert len(golden_ids.intersection(retrieved_ids)) == 0
+    # 1. Inspect actual trained classifier artifact
+    clf = HybridIntentClassifier()
+    if os.path.exists("models/intent_classifier.pkl") and clf.load("models/intent_classifier.pkl"):
+        actual_clf_train_ids = getattr(clf, 'trained_conversation_ids', [])
+        if actual_clf_train_ids:
+            assert len(golden_ids.intersection(set(actual_clf_train_ids))) == 0
+
+    # 2. Inspect actual serialized retriever artifact
+    retriever = HistoricalSupportInteractionRetriever()
+    if os.path.exists("models/vector_store.pkl") and retriever.load("models/vector_store.pkl"):
+        retrieved_ids = {item.get('conversation_id') for item in retriever.items if 'conversation_id' in item}
+        assert len(golden_ids.intersection(retrieved_ids)) == 0
+
+    # 3. Inspect model_metadata.json manifest if present
+    if os.path.exists("models/model_metadata.json"):
+        with open("models/model_metadata.json", 'r', encoding='utf-8') as f:
+            meta = json.load(f)
+        guard_info = meta.get('data_leakage_guard', {})
+        if guard_info:
+            assert guard_info.get('exact_id_leakage_classifier_count', 0) == 0
+            assert guard_info.get('exact_id_leakage_retriever_count', 0) == 0
 
 
 def test_near_duplicate_leakage_detection():
-    """Verifies near-duplicate leakage detection between golden evaluation set and training customer messages."""
-    from src.evaluate import compute_token_jaccard_overlap
+    """Rigorously evaluates near-duplicate text leakage across ALL held-out golden customer messages vs ALL training customer messages."""
+    from src.evaluate import detect_near_duplicate_leakage
     golden_path = "golden/golden_set.jsonl"
     processed_path = "data/processed/amazonhelp_threads.jsonl"
 
     if os.path.exists(golden_path) and os.path.exists(processed_path):
-        with open(golden_path, 'r', encoding='utf-8') as f:
-            golden_msgs = [json.loads(line)['customer_message'] for line in f][:5]
-        with open(processed_path, 'r', encoding='utf-8') as f:
-            train_msgs = [json.loads(line)['customer_message'] for line in f][:50]
-
-        high_overlaps = []
-        for g_msg in golden_msgs:
-            for t_msg in train_msgs:
-                overlap = compute_token_jaccard_overlap(g_msg, t_msg)
-                if overlap > 0.90:
-                    high_overlaps.append((g_msg, t_msg, overlap))
-
-        assert isinstance(high_overlaps, list)
+        diag = detect_near_duplicate_leakage(
+            golden_path=golden_path,
+            processed_path=processed_path,
+            similarity_threshold=0.85
+        )
+        assert diag['status'] in ['PASSED', 'EMPTY']
+        assert diag['near_duplicate_count'] == 0, f"Near-duplicate data leakage detected! Pairs: {diag.get('near_duplicate_pairs')}"
+        assert diag['max_near_duplicate_similarity'] < 0.85, f"Max similarity {diag.get('max_near_duplicate_similarity')} exceeded threshold 0.85"
 
 
 def test_resolved_brand_passed_to_generator_and_judge():

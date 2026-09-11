@@ -1,7 +1,14 @@
 {
-  "run_id": "2026-09-10T040801Z",
-  "run_directory": "results/runs/2026-09-10T040801Z",
+  "run_id": "test_run_provenance_123",
+  "run_directory": "results/runs/test_run_provenance_123",
   "resolved_brand_handle": "@AmazonHelp",
+  "near_duplicate_diagnostics": {
+    "max_near_duplicate_similarity": 0.6828,
+    "near_duplicate_count": 0,
+    "similarity_threshold": 0.85,
+    "status": "PASSED",
+    "near_duplicate_pairs": []
+  },
   "token_jaccard_disclosure": "Token Jaccard overlap is a simple diagnostic surface metric over unigram token sets. It loses word order, semantic intent, negation, and factual grounding. Human review and LLM rubric evaluations serve as primary quality measures.",
   "runtime_llm_config": {
     "provider": "auto",

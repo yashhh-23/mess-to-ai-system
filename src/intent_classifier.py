@@ -125,11 +125,13 @@ class HybridIntentClassifier:
 
         train_texts = []
         train_labels = []
+        self.trained_conversation_ids = []
 
         for thread in threads:
             if thread['conversation_id'] in golden_ids:
                 continue
             
+            self.trained_conversation_ids.append(thread['conversation_id'])
             context_str = " ".join(thread.get('context_messages', []))
             full_input = f"{context_str} Customer: {thread['customer_message']}".strip()
             

@@ -8,6 +8,7 @@ import hashlib
 import numpy as np
 from typing import List, Dict, Any, Optional
 from sklearn.metrics import classification_report, precision_recall_fscore_support
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -34,6 +35,75 @@ def compute_token_jaccard_overlap(s1: str, s2: str) -> float:
     return float(len(intersection) / len(union))
 
 compute_text_similarity = compute_token_jaccard_overlap  # Alias for backward compatibility
+
+def detect_near_duplicate_leakage(
+    golden_path: str = "golden/golden_set.jsonl",
+    processed_path: str = "data/processed/amazonhelp_threads.jsonl",
+    similarity_threshold: float = 0.85
+) -> Dict[str, Any]:
+    """
+    Evaluates near-duplicate text leakage between held-out golden evaluation customer messages
+    and training customer messages using sparse TF-IDF cosine similarity across all pairs.
+    """
+    if not os.path.exists(golden_path) or not os.path.exists(processed_path):
+        return {
+            'max_near_duplicate_similarity': 0.0,
+            'near_duplicate_count': 0,
+            'similarity_threshold': similarity_threshold,
+            'status': 'FILES_MISSING',
+            'near_duplicate_pairs': []
+        }
+
+    with open(golden_path, 'r', encoding='utf-8') as f:
+        golden_items = [json.loads(line) for line in f]
+
+    with open(processed_path, 'r', encoding='utf-8') as f:
+        processed_items = [json.loads(line) for line in f]
+
+    golden_ids = {g['conversation_id'] for g in golden_items}
+    train_items = [p for p in processed_items if p['conversation_id'] not in golden_ids]
+
+    gold_msgs = [g['customer_message'] for g in golden_items]
+    train_msgs = [t['customer_message'] for t in train_items]
+
+    if not gold_msgs or not train_msgs:
+        return {
+            'max_near_duplicate_similarity': 0.0,
+            'near_duplicate_count': 0,
+            'similarity_threshold': similarity_threshold,
+            'status': 'EMPTY',
+            'near_duplicate_pairs': []
+        }
+
+    vec = TfidfVectorizer(ngram_range=(1, 2)).fit(train_msgs)
+    X_train = vec.transform(train_msgs)
+    X_gold = vec.transform(gold_msgs)
+
+    sim_matrix = X_gold.dot(X_train.T)
+    max_sims = sim_matrix.max(axis=1).toarray().ravel()
+
+    near_dupes = []
+    for idx, max_sim in enumerate(max_sims):
+        if max_sim >= similarity_threshold:
+            train_idx = int(np.argmax(sim_matrix[idx].toarray().ravel()))
+            near_dupes.append({
+                'golden_id': golden_items[idx]['conversation_id'],
+                'train_id': train_items[train_idx]['conversation_id'],
+                'similarity': float(round(max_sim, 4)),
+                'golden_msg': gold_msgs[idx],
+                'train_msg': train_msgs[train_idx]
+            })
+
+    max_sim_val = float(round(float(max_sims.max()), 4)) if len(max_sims) > 0 else 0.0
+
+    return {
+        'max_near_duplicate_similarity': max_sim_val,
+        'near_duplicate_count': len(near_dupes),
+        'similarity_threshold': similarity_threshold,
+        'status': 'PASSED' if len(near_dupes) == 0 else 'WARNING_LEAKAGE_DETECTED',
+        'near_duplicate_pairs': near_dupes
+    }
+
 
 def compute_wilson_confidence_interval(k: int, n: int, confidence: float = 0.95) -> Dict[str, float]:
     """Computes Wilson Score 95% Confidence Interval for a proportion k/n."""
@@ -799,10 +869,13 @@ def run_evaluation(config_path: str = "configs/config.yaml", run_id: Optional[st
         'agreement_metrics': agreement_metrics
     }
 
+    near_dupe_diag = detect_near_duplicate_leakage(golden_path=golden_path, processed_path=config['paths']['processed_data'])
+
     output_res = {
         'run_id': run_id,
         'run_directory': run_dir,
         'resolved_brand_handle': brand_handle,
+        'near_duplicate_diagnostics': near_dupe_diag,
         'token_jaccard_disclosure': (
             "Token Jaccard overlap is a simple diagnostic surface metric over unigram token sets. "
             "It loses word order, semantic intent, negation, and factual grounding. Human review and "

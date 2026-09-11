@@ -14,7 +14,7 @@ from golden.build_golden_set import load_and_verify_golden_set
 from golden.create_human_calibration import verify_calibration_dataset
 from src.intent_classifier import HybridIntentClassifier
 from src.retrieval import HistoricalSupportInteractionRetriever
-from src.evaluate import run_evaluation, compute_source_code_hash
+from src.evaluate import run_evaluation, compute_source_code_hash, detect_near_duplicate_leakage
 
 def compute_file_hash(filepath: str) -> str:
     """Computes MD5 hash of a file for checksum verification."""
@@ -105,9 +105,24 @@ def execute_master_pipeline(config_path: str = "configs/config.yaml"):
     train_intents = [clf._rule_fallback(t['customer_message']) for t in train_threads]
     class_dist = {intent: train_intents.count(intent) for intent in set(train_intents)}
 
-    # Generate run_id for evaluation provenance tracking
-    run_id = time.strftime("%Y-%m-%dT%H%M%SZ", time.gmtime())
-    run_dir = os.path.join("results", "runs", run_id)
+    clf_train_ids = getattr(clf, 'trained_conversation_ids', [t['conversation_id'] for t in train_threads])
+    retrieval_indexed_ids = [item['conversation_id'] for item in retriever.items if 'conversation_id' in item]
+    near_dupe_diag = detect_near_duplicate_leakage(
+        golden_path=config['paths']['golden_set'],
+        processed_path=processed_jsonl
+    )
+
+    data_leakage_guard_info = {
+        'golden_conversation_ids_count': len(golden_ids),
+        'trained_conversation_ids_count': len(clf_train_ids),
+        'retrieval_indexed_ids_count': len(retrieval_indexed_ids),
+        'exact_id_leakage_classifier_count': len(set(golden_ids).intersection(set(clf_train_ids))),
+        'exact_id_leakage_retriever_count': len(set(golden_ids).intersection(set(retrieval_indexed_ids))),
+        'near_duplicate_diagnostics': near_dupe_diag,
+        'golden_conversation_ids': sorted(list(golden_ids)),
+        'trained_conversation_ids': clf_train_ids,
+        'retrieval_indexed_conversation_ids': retrieval_indexed_ids
+    }
 
     # Save Model Artifact Metadata Manifest
     manifest_checksum = compute_file_hash("data/raw/data_manifest.json")
@@ -129,6 +144,7 @@ def execute_master_pipeline(config_path: str = "configs/config.yaml"):
             'vector_index_count': len(retriever.items)
         },
         'train_class_distribution': class_dist,
+        'data_leakage_guard': data_leakage_guard_info,
         'config_hash': compute_file_hash(config_path),
         'raw_data_checksum': compute_file_hash(config['paths']['raw_data']),
         'dataset_manifest_checksum': manifest_checksum,
