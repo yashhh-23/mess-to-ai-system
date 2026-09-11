@@ -344,7 +344,6 @@ def check_artifact_metadata(config_path: str = "configs/config.yaml", metadata_p
 
     checks = {
         'config_hash': (config_path, meta.get('config_hash')),
-        'raw_data_checksum': (raw_csv_path, meta.get('raw_data_checksum')),
         'dataset_manifest_checksum': (manifest_path, meta.get('dataset_manifest_checksum')),
         'processed_data_checksum': (processed_path, meta.get('processed_data_checksum')),
         'golden_set_checksum': (golden_path, meta.get('golden_set_checksum')),
@@ -361,6 +360,35 @@ def check_artifact_metadata(config_path: str = "configs/config.yaml", metadata_p
         actual_src_hash = compute_source_code_hash(project_root=project_root)
         if actual_src_hash != expected_src_hash:
             mismatches.append(f"source_code_hash (expected {expected_src_hash[:8]}..., got {actual_src_hash[:8]}...)")
+
+    # Verify raw CSV checksum if file exists; if absent, require trusted data_manifest.json
+    expected_raw_checksum = meta.get('raw_data_checksum')
+    if expected_raw_checksum:
+        if os.path.exists(raw_csv_path):
+            actual_raw = _compute_md5(raw_csv_path)
+            if actual_raw != expected_raw_checksum:
+                mismatches.append(f"raw_data_checksum ({raw_csv_path}: expected {expected_raw_checksum[:8]}..., got {actual_raw[:8]}...)")
+        else:
+            if not os.path.exists(manifest_path):
+                raise RuntimeError(
+                    f"[Artifact Validation Error] Raw data file '{raw_csv_path}' is missing "
+                    f"and no trusted manifest found at '{manifest_path}'.\n"
+                    "Run 'python src/download_data.py' or 'python run_pipeline.py' to download."
+                )
+            try:
+                with open(manifest_path, 'r', encoding='utf-8') as f:
+                    manifest_data = json.load(f)
+                    if not isinstance(manifest_data, dict) or 'file_size_bytes' not in manifest_data:
+                        raise ValueError("Manifest missing required schema fields.")
+            except Exception as e:
+                raise RuntimeError(
+                    f"[Artifact Validation Error] Raw data file '{raw_csv_path}' is missing "
+                    f"and manifest at '{manifest_path}' is invalid: {e}"
+                ) from e
+            print(
+                f"[Artifact Validation] Raw CSV absent ({raw_csv_path}); using processed data with trusted manifest ({manifest_path}). "
+                "Re-run pipeline if you need to retrain from source."
+            )
 
     for key, (fpath, expected) in checks.items():
         if not expected:

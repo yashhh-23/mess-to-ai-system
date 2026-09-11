@@ -102,6 +102,9 @@ Run the complete end-to-end pipeline (data ingest, thread cleaning, golden verif
 python run_pipeline.py
 ```
 
+### Data Download Requirement
+The raw TWCS CSV (~500 MB) is not stored in this repository. Before running `python run_pipeline.py` from scratch, ensure you have network access so that `src/download_data.py` can fetch `twcs.csv` from the configured Hugging Face URL and write `data/raw/data_manifest.json`. If you only want to re-run evaluation on the committed processed data and models, you can skip the raw download; the evaluation harness will detect the missing CSV, verify the manifest, and proceed.
+
 ### 4. Run Pytest Suite
 Verify pipeline components using pytest:
 

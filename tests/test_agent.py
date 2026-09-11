@@ -436,6 +436,51 @@ def test_source_code_hash_mismatch_fails_evaluation(tmp_path):
             check_artifact_metadata(metadata_path=str(meta_file))
 
 
+def test_missing_raw_csv_handling_in_artifact_validation(tmp_path):
+    """Verifies missing raw CSV passes validation if manifest exists, but fails if manifest is missing."""
+    meta_file = tmp_path / "metadata.json"
+    manifest_file = tmp_path / "data_manifest.json"
+    manifest_file.write_text(json.dumps({'file_size_bytes': 12345, 'download_url': 'http://example.com'}), encoding="utf-8")
+
+    meta_data = {
+        'source_code_hash': 'valid_hash',
+        'raw_data_checksum': 'expected_raw_md5_abc'
+    }
+    meta_file.write_text(json.dumps(meta_data), encoding="utf-8")
+
+    orig_exists = os.path.exists
+
+    # Case A: Missing CSV AND missing manifest -> RuntimeError
+    def mock_exists_no_manifest(path):
+        p = str(path)
+        if "twcs.csv" in p or "data_manifest.json" in p:
+            return False
+        return orig_exists(path)
+
+    with patch("src.evaluate.compute_source_code_hash", return_value="valid_hash"), \
+         patch("os.path.exists", side_effect=mock_exists_no_manifest):
+        with pytest.raises(RuntimeError, match="missing and no trusted manifest"):
+            check_artifact_metadata(metadata_path=str(meta_file))
+
+    # Case B: Missing CSV BUT manifest exists -> passes raw CSV check
+    def mock_exists_with_manifest(path):
+        p = str(path)
+        if "twcs.csv" in p:
+            return False
+        if "data_manifest.json" in p:
+            return True
+        return orig_exists(path)
+
+    def mock_compute_md5(path):
+        return "valid_hash"
+
+    with patch("src.evaluate.compute_source_code_hash", return_value="valid_hash"), \
+         patch("src.evaluate._compute_md5", side_effect=mock_compute_md5), \
+         patch("os.path.exists", side_effect=mock_exists_with_manifest):
+        res = check_artifact_metadata(metadata_path=str(meta_file))
+        assert res is True
+
+
 def test_golden_set_ids_disjoint_from_classifier_and_retriever():
     """Verifies golden-set conversation IDs are disjoint from classifier training set, retrieval index, and model metadata manifest."""
     golden_path = "golden/golden_set.jsonl"
